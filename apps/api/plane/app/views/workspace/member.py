@@ -214,11 +214,6 @@ class WorkspaceMemberUserEndpoint(BaseAPIView):
     use_read_replica = True
 
     def get(self, request, slug):
-        print("*"*100)
-        print("*"*100)
-        print("*"*100)
-        print("*"*100)
-        print("*"*100)
         draft_issue_count = (
             DraftIssue.objects.filter(created_by=request.user, workspace_id=OuterRef("workspace_id"))
             .values("workspace_id")
