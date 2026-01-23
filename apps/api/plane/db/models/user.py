@@ -169,6 +169,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         if self.is_superuser:
             self.is_staff = True
+            
+        if self.is_password_reset_required is None:
+            self.is_password_reset_required = False
 
         super(User, self).save(*args, **kwargs)
 

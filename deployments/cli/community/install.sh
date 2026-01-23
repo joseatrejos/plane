@@ -183,37 +183,29 @@ function syncEnvFile(){
 }
 
 function buildYourOwnImage(){
-    echo "Building images locally..."
+    echo "🔨 Construyendo imágenes desde tu código local..."
 
     export DOCKERHUB_USER="myplane"
     export APP_RELEASE="local"
     export PULL_POLICY="never"
     CUSTOM_BUILD="true"
 
-    # checkout the code to ~/tmp/plane folder and build the images
-    local PLANE_TEMP_CODE_DIR=~/tmp/plane
-    rm -rf $PLANE_TEMP_CODE_DIR
-    mkdir -p $PLANE_TEMP_CODE_DIR
-    REPO=https://github.com/$GH_REPO.git
-    git clone "$REPO" "$PLANE_TEMP_CODE_DIR"  --branch "$BRANCH" --single-branch --depth 1
+    # En lugar de clonar, apuntamos a la raíz de tu repo actual
+    # Subimos niveles desde deployments/cli/community/plane-app/ hasta la raíz
+    local PLANE_LOCAL_SOURCE=$SCRIPT_DIR/../../../../ 
+    
+    echo "Ruta detectada: $PLANE_LOCAL_SOURCE"
 
-    local SOURCE_BUILD_YML="$SCRIPT_DIR/build.yml"
-    if [ -f "$SOURCE_BUILD_YML" ]; then
-        cp "$SOURCE_BUILD_YML" "$PLANE_TEMP_CODE_DIR/build.yml"
-    else
-        cp "$PLANE_TEMP_CODE_DIR/deployments/cli/community/build.yml" "$PLANE_TEMP_CODE_DIR/build.yml"
-    fi
+    # Usamos el archivo build.yml que ya existe en el repo para construir
+    cd "$PLANE_LOCAL_SOURCE" || exit
 
-    cd "$PLANE_TEMP_CODE_DIR" || exit
-
-    /bin/bash -c "$COMPOSE_CMD -f build.yml build --no-cache"  >&2
+    /bin/bash -c "$COMPOSE_CMD -f build.yml build" >&2
+    
     if [ $? -ne 0 ]; then
-        echo "Build failed. Exiting..."
+        echo "❌ Error en el build. Revisa los logs de arriba."
         exit 1
     fi
-    echo "Build completed successfully"
-    echo ""
-    echo "You can now start the services by running the command: ./setup.sh start"
+    echo "✅ Build completado con tu código local."
     echo ""
 }
 

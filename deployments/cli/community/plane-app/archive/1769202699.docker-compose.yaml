@@ -105,19 +105,15 @@ services:
 
   api:
     image: ${DOCKERHUB_USER:-artifacts.plane.so/makeplane}/plane-backend:${APP_RELEASE:-stable}
-    command: ./bin/docker-entrypoint-api-local.sh
+    command: ./bin/docker-entrypoint-api.sh
     deploy:
       replicas: ${API_REPLICAS:-1}
       restart_policy:
         condition: any
     volumes:
       - logs_api:/code/plane/logs
-      - ../../../../apps/api:/code/
     environment:
       <<: [*app-env, *db-env, *redis-env, *minio-env, *aws-s3-env, *proxy-env]
-      DEBUG: 1
-      PYTHONUNBUFFERED: 1
-      USE_STAT_RELOADER: 1
     depends_on:
       - plane-db
       - plane-redis
