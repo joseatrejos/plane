@@ -170,3 +170,28 @@ Please read [CONTRIBUTING.md](https://github.com/makeplane/plane/blob/master/CON
 ## License
 
 This project is licensed under the [GNU Affero General Public License v3.0](https://github.com/makeplane/plane/blob/master/LICENSE.txt).
+
+# Como correr el proyecto local by nosotros
+
+0. Usar WSL, con windows no se como se haga, se necesita docker, node, pnpm, corepack y python
+1. Entrar a la ruta usando cd con el siguiente comando
+
+```bash
+cd deployments/cli/community
+```
+
+2. Ejecutar install.sh con el sigueinte comando
+
+```bash
+. ./install.sh
+```
+
+3. Te va a desplegar un menú, presiona 1, te va a empezar a buildear todas las imagenes de docker
+4. Va a sobreescribir un docker-compose.yml que esta en plane-app, ese hay que hacer git restore para quedarnos con la versión del repositorio, para esto ejecuta el siguiente comando
+
+```py
+git restore plane-app docker-compose.yaml
+```
+
+5. Ejecutar el siguiente comando dentro de la carpeta community: `. ./install.sh start`
+6. Fin del tutorial para correr el proyecto
