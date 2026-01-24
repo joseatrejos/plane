@@ -20,3 +20,7 @@ def convert_uuid_to_integer(uuid_val: uuid.UUID) -> int:
     h: bytes = hashlib.sha256(uuid_value.encode()).digest()
     bigint: int = int.from_bytes(h[:8], byteorder="big", signed=True)
     return bigint
+
+
+def get_anchor():
+    return uuid.uuid4().hex

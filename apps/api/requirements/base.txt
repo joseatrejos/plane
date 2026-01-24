@@ -71,3 +71,6 @@ opentelemetry-exporter-otlp==1.28.1
 drf-spectacular==0.28.0
 # html sanitizer
 nh3==0.2.18
+openfeature-sdk==0.7.0
+strawberry-graphql-django==0.48.0
+firebase-admin==6.6.0
