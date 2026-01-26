@@ -5,12 +5,12 @@ import base64
 # Python imports
 from typing import Optional
 
-# # Third party imports
-# import firebase_admin
+# Third party imports
+import firebase_admin
 
-# # Django imports
-# from django.conf import settings
-# from firebase_admin import credentials, messaging
+# Django imports
+from django.conf import settings
+from firebase_admin import credentials, messaging
 
 # Module imports
 from .helper import is_mobile_push_notification_disabled

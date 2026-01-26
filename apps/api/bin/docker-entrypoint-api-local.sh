@@ -1,12 +1,15 @@
 #!/bin/bash
 set -e
-python manage.py wait_for_db
-# Wait for migrations
-python manage.py wait_for_migrations
+
+# --- EL PARCHE DEFINITIVO PARA ALPINE ---
+echo "🛠️ Instalando herramientas de compilación en Alpine..."
+# Instalamos lo mínimo necesario para que psutil pueda compilar
+apk add --no-cache gcc musl-dev python3-dev linux-headers
 
 echo "📦 Instalando dependencias de Python..."
-pip install -r requirements.txt
-# ------------------------
+# Intentamos instalar primero las versiones binarias para ahorrar tiempo
+pip install --no-cache-dir --only-binary=:all: psutil || pip install --no-cache-dir psutil
+pip install --no-cache-dir -r requirements.txt
 
 python manage.py wait_for_db
 python manage.py wait_for_migrations

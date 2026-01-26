@@ -216,7 +216,7 @@ export default {
   projects_and_issues_description: "Toggle these on or off this project.",
   cycles_description:
     "Timebox work per project and adjust the time period as needed. One cycle can be 2 weeks, the next 1 week.",
-  modules_description: "Organize work into sub-projects with dedicated leads and assignees.",
+  modules_description: "Organize work into sub-projects with dedicated leads and assignees.........................",
   views_description: "Save custom sorts, filters, and display options or share them with your team.",
   pages_description: "Create and edit free-form content; notes, docs, anything.",
   intake_description: "Let non-members share bugs, feedback, and suggestions; without disrupting your workflow.",

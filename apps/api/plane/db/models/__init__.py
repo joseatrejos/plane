@@ -34,6 +34,7 @@ from .issue import (
     IssueLabel,
     IssueLink,
     IssueMention,
+    IssueUserProperty,
     IssueReaction,
     IssueRelation,
     IssueSequence,
