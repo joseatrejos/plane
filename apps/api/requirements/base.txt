@@ -105,3 +105,6 @@ psutil==7.0.0
 
 # pgtriggers
 django-pgtrigger==4.15.3
+
+
+scout-apm==3.5.2
