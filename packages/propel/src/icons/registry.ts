@@ -13,6 +13,7 @@ import { GridLayoutIcon } from "./layouts/grid-icon";
 import { ListLayoutIcon } from "./layouts/list-icon";
 import { SheetLayoutIcon } from "./layouts/sheet-icon";
 import { TimelineLayoutIcon } from "./layouts/timeline-icon";
+import { ClockIcon } from "./project/clock-icon";
 import { CycleIcon } from "./project/cycle-icon";
 import { EpicIcon } from "./project/epic-icon";
 import { IntakeIcon } from "./project/intake-icon";
@@ -81,6 +82,7 @@ export const ICON_REGISTRY = {
   "project.page": PageIcon,
   "project.view": ViewsIcon,
   "project.work-items": WorkItemsIcon,
+  "project.clock": ClockIcon,
 
   // Layout icons
   "layout.calendar": CalendarLayoutIcon,

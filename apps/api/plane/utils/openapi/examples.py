@@ -672,6 +672,39 @@ CYCLE_ISSUE_EXAMPLE = OpenApiExample(
     },
 )
 
+# Epic Response Examples
+EPIC_EXAMPLE = OpenApiExample(
+    name="Epic",
+    value={
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Epic 1",
+        "description": "Epic 1 description",
+    },
+    description="Example response for an epic",
+)
+
+# Initiative Response Examples
+INITIATIVE_EXAMPLE = OpenApiExample(
+    name="Initiative",
+    value={
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Initiative 1",
+        "description": "Initiative 1 description",
+    },
+)
+
+# Initiative Label Response Examples
+INITIATIVE_LABEL_EXAMPLE = OpenApiExample(
+    name="InitiativeLabel",
+    value={
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Initiative Label 1",
+        "description": "Initiative Label 1 description",
+        "created_at": "2024-01-01T10:30:00Z",
+    },
+)
+
+# Sticky Response Examples
 STICKY_EXAMPLE = OpenApiExample(
     name="Sticky",
     value={
@@ -679,6 +712,43 @@ STICKY_EXAMPLE = OpenApiExample(
         "name": "Sticky 1",
         "description_html": "<p>Sticky 1 description</p>",
         "created_at": "2024-01-01T10:30:00Z",
+    },
+)
+
+# Teamspace Response Examples
+TEAMSPACE_EXAMPLE = OpenApiExample(
+    name="Teamspace",
+    value={
+        "id": "550e8400-e29b-41d4-a716-446655440000",
+        "name": "Teamspace 1",
+        "description": "Teamspace 1 description",
+    },
+)
+
+# Project Feature Response Examples
+PROJECT_FEATURE_EXAMPLE = OpenApiExample(
+    name="ProjectFeature",
+    value={
+        "epics": True,
+        "modules": True,
+        "cycles": True,
+        "views": True,
+        "pages": True,
+        "intakes": True,
+        "work_item_types": True,
+    },
+)
+
+# Workspace Feature Response Examples
+WORKSPACE_FEATURE_EXAMPLE = OpenApiExample(
+    name="WorkspaceFeature",
+    value={
+        "project_grouping": True,
+        "initiatives": True,
+        "teams": True,
+        "customers": True,
+        "wiki": True,
+        "pi": True,
     },
 )
 
@@ -790,6 +860,34 @@ SAMPLE_CYCLE_ISSUE = {
     "created_at": "2024-01-01T10:30:00Z",
 }
 
+SAMPLE_EPIC = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Epic 1",
+    "description": "Epic 1 description",
+    "created_at": "2024-01-01T10:30:00Z",
+}
+
+SAMPLE_PAGE = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Sample Page",
+    "description": "Sample page description",
+    "created_at": "2024-01-01T10:30:00Z",
+}
+
+SAMPLE_INITIATIVE = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Initiative 1",
+    "description": "Initiative 1 description",
+    "created_at": "2024-01-01T10:30:00Z",
+}
+
+SAMPLE_INITIATIVE_LABEL = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Initiative Label 1",
+    "description": "Initiative Label 1 description",
+    "created_at": "2024-01-01T10:30:00Z",
+}
+
 SAMPLE_STICKY = {
     "id": "550e8400-e29b-41d4-a716-446655440000",
     "name": "Sticky 1",
@@ -797,6 +895,31 @@ SAMPLE_STICKY = {
     "created_at": "2024-01-01T10:30:00Z",
 }
 
+SAMPLE_TEAMSPACE = {
+    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "name": "Teamspace 1",
+    "description": "Teamspace 1 description",
+    "created_at": "2024-01-01T10:30:00Z",
+}
+
+SAMPLE_PROJECT_FEATURE = {
+    "epics": True,
+    "modules": True,
+    "cycles": True,
+    "views": True,
+    "pages": True,
+    "intakes": True,
+    "work_item_types": True,
+}
+
+SAMPLE_WORKSPACE_FEATURE = {
+    "project_grouping": True,
+    "initiatives": True,
+    "teams": True,
+    "customers": True,
+    "wiki": True,
+    "pi": True,
+}
 # Mapping of schema types to sample data
 SCHEMA_EXAMPLES = {
     "Issue": SAMPLE_ISSUE,
@@ -812,6 +935,13 @@ SCHEMA_EXAMPLES = {
     "Intake": SAMPLE_INTAKE,
     "CycleIssue": SAMPLE_CYCLE_ISSUE,
     "Sticky": SAMPLE_STICKY,
+    "Epic": SAMPLE_EPIC,
+    "Page": SAMPLE_PAGE,
+    "Initiative": SAMPLE_INITIATIVE,
+    "InitiativeLabel": SAMPLE_INITIATIVE_LABEL,
+    "Teamspace": SAMPLE_TEAMSPACE,
+    "ProjectFeature": SAMPLE_PROJECT_FEATURE,
+    "WorkspaceFeature": SAMPLE_WORKSPACE_FEATURE,
 }
 
 

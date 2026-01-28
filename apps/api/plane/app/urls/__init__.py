@@ -46,6 +46,6 @@ urlpatterns = [
     *exporter_urls,
 
     # ee
-    # *ee_urls,
+    *ee_urls,
 
 ]

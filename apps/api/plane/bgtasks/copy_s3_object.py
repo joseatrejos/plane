@@ -149,3 +149,32 @@ def copy_s3_objects_of_description_and_assets(entity_name, entity_identifier, pr
     except Exception as e:
         log_exception(e)
         return []
+
+
+@shared_task
+def copy_s3_objects_of_issue_attachment(
+    project_id: str,
+    user_id: str,
+    original_issue_id: str,
+    entity_identifier: str,
+    copy_to_entity_project: bool = False,
+) -> None:
+    """
+    This task is used to duplicate the issue attachment assets of an issue
+    """
+    original_asset_ids = []
+    issue = Issue.objects.get(pk=original_issue_id)
+    issue_attachment_assets = list(issue.assets.filter(entity_type="ISSUE_ATTACHMENT").values_list("id", flat=True))
+
+    issue_attachment_asset_ids = [str(asset) for asset in issue_attachment_assets]
+
+    original_asset_ids.extend(issue_attachment_asset_ids)
+    copy_assets(
+        entity=issue,
+        asset_ids=original_asset_ids,
+        project_id=project_id,
+        user_id=user_id,
+        copy_to_entity_project=copy_to_entity_project,
+        entity_identifier=entity_identifier,
+    )
+    return

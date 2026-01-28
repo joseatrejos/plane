@@ -4,13 +4,6 @@ python manage.py wait_for_db
 # Wait for migrations
 python manage.py wait_for_migrations
 
-echo "📦 Instalando dependencias de Python..."
-pip install -r requirements.txt
-# ------------------------
-
-python manage.py wait_for_db
-python manage.py wait_for_migrations
-
 # Create the default bucket
 #!/bin/bash
 

@@ -89,33 +89,45 @@ def convert_to_utc(date, project_id, is_start_date=False):
         # Return the UTC datetime for storage
         return utc_datetime
 
-
-def convert_utc_to_project_timezone(utc_datetime, project_id):
+def get_current_time(timezone_str):
     """
-    Converts a UTC datetime (stored in the database) to the project's local timezone.
-
-    Args:
-        utc_datetime (datetime): The UTC datetime to be converted.
-        project_id (int): The project's ID to fetch the associated timezone.
-
-    Returns:
-        datetime: The datetime in the project's local timezone.
+    Get current time for a specific timezone
     """
+    try:
+        tz = pytz.timezone(timezone_str)
+        utc_now = datetime.now(pytz.UTC)
+        current_datetime = utc_now.astimezone(tz)
+        return current_datetime
+
+    except pytz.exceptions.UnknownTimeZoneError as e:
+        raise ValueError(f"Invalid timezone: {str(e)}")
+
+
+def convert_to_utc_with_timestamp(project_id, date):
+    """
+    Convert a date to UTC based on project timezone
+    """
+
     # Retrieve the project's timezone using the project ID
     project = Project.objects.get(id=project_id)
     project_timezone = project.timezone
-    if not project_timezone:
-        raise ValueError("Project timezone must be provided.")
+    if not date or not project_timezone:
+        raise ValueError("Both date and timezone must be provided.")
 
-    # Get the timezone object for the project's timezone
+    # Parse the string into a date object
+    current_date = datetime.strptime(date, "%Y-%m-%d").date()
+    local_datetime = datetime.combine(
+        current_date, get_current_time(project.timezone).time()
+    )
+
+    # Get the project's timezone
     local_tz = pytz.timezone(project_timezone)
 
-    # Convert the UTC datetime to the project's local timezone
-    if utc_datetime.tzinfo is None:
-        # Localize UTC datetime if it's naive (i.e., without timezone info)
-        utc_datetime = pytz.utc.localize(utc_datetime)
+    # Localize the datetime to the project's timezone
+    localized_datetime = local_tz.localize(local_datetime)
 
-    # Convert to the project's local timezone
-    local_datetime = utc_datetime.astimezone(local_tz)
+    # Convert the localized datetime to UTC
+    utc_datetime = localized_datetime.astimezone(pytz.utc)
 
-    return local_datetime
+    # Return the UTC datetime for storage
+    return utc_datetime

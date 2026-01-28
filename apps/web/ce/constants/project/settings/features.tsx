@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 // plane imports
-import { CycleIcon, IntakeIcon, ModuleIcon, PageIcon, ViewsIcon } from "@plane/propel/icons";
+import { CycleIcon, IntakeIcon, ModuleIcon, PageIcon, ViewsIcon, Icon } from "@plane/propel/icons";
 import type { IProject } from "@plane/types";
 
 export type TProperties = {
@@ -69,20 +69,49 @@ export const PROJECT_BASE_FEATURES_LIST: TBaseFeatureList = {
   },
 };
 
-type TProjectFeatures = {
-  project_features: {
-    key: string;
-    title: string;
-    description: string;
-    featureList: TBaseFeatureList;
-  };
+type FeatureItem = {
+  key: string;
+  property?: string;
+  title: string;
+  description: string;
+  icon?: ReactNode;
+  isPro: boolean;
+  isEnabled: boolean;
 };
 
-export const PROJECT_FEATURES_LIST: TProjectFeatures = {
+type FeatureGroup = {
+  key: string;
+  title: string;
+  description: string;
+  featureList: Record<string, FeatureItem>;
+};
+
+type ProjectFeaturesList = {
+  project_features: FeatureGroup;
+  work_management: FeatureGroup;
+};
+
+export const PROJECT_FEATURES_LIST: ProjectFeaturesList = {
   project_features: {
     key: "projects_and_issues",
     title: "Projects and work items",
     description: "Toggle these on or off this project.",
     featureList: PROJECT_BASE_FEATURES_LIST,
+  },
+  work_management: {
+    key: "work_management",
+    title: "Work management",
+    description: "Manage your work and projects with ease.",
+    featureList: {
+      time_tracking: {
+        key: "time_tracking",
+        property: "is_time_tracking_enabled",
+        title: "Time Tracking",
+        description: "Log time spent on work items and projects.",
+        icon: <Icon name="project.clock" className="h-5 w-5 flex-shrink-0 text-custom-text-300" />,
+        isPro: false,
+        isEnabled: true,
+      },
+    },
   },
 };
