@@ -1,4 +1,3 @@
-import React from "react";
 import { observer } from "mobx-react";
 // i18n
 import { useTranslation } from "@plane/i18n";
@@ -39,6 +38,7 @@ import { DateAlert } from "@/plane-web/components/issues/issue-details/sidebar.t
 import { IssueWorklogProperty } from "@/plane-web/components/issues/worklog/property";
 import { IssueCycleSelect } from "./cycle-select";
 import { IssueLabel } from "./label";
+import { IssueTotalWorklog } from "./issue-worklog";
 import { IssueModuleSelect } from "./module-select";
 import type { TIssueOperations } from "./root";
 
@@ -90,7 +90,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </div>
               <StateDropdown
                 value={issue?.state_id}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val });
+                }}
                 projectId={projectId?.toString() ?? ""}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
@@ -109,7 +111,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </div>
               <MemberDropdown
                 value={issue?.assignee_ids ?? undefined}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val });
+                }}
                 disabled={!isEditable}
                 projectId={projectId?.toString() ?? ""}
                 placeholder={t("issue.add.assignee")}
@@ -133,7 +137,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </div>
               <PriorityDropdown
                 value={issue?.priority}
-                onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { priority: val })}
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, { priority: val });
+                }}
                 disabled={!isEditable}
                 buttonVariant="border-with-text"
                 className="w-3/5 flex-grow rounded px-2 hover:bg-custom-background-80"
@@ -163,11 +169,11 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               <DateDropdown
                 placeholder={t("issue.add.start_date")}
                 value={issue.start_date}
-                onChange={(val) =>
-                  issueOperations.update(workspaceSlug, projectId, issueId, {
+                onChange={(val) => {
+                  void issueOperations.update(workspaceSlug, projectId, issueId, {
                     start_date: val ? renderFormattedPayloadDate(val) : null,
-                  })
-                }
+                  });
+                }}
                 maxDate={maxDate ?? undefined}
                 disabled={!isEditable}
                 buttonVariant="transparent-with-text"
@@ -190,11 +196,11 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                 <DateDropdown
                   placeholder={t("issue.add.due_date")}
                   value={issue.target_date}
-                  onChange={(val) =>
-                    issueOperations.update(workspaceSlug, projectId, issueId, {
+                  onChange={(val) => {
+                    void issueOperations.update(workspaceSlug, projectId, issueId, {
                       target_date: val ? renderFormattedPayloadDate(val) : null,
-                    })
-                  }
+                    });
+                  }}
                   minDate={minDate ?? undefined}
                   disabled={!isEditable}
                   buttonVariant="transparent-with-text"
@@ -221,9 +227,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                 </div>
                 <EstimateDropdown
                   value={issue?.estimate_point ?? undefined}
-                  onChange={(val: string | undefined) =>
-                    issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val })
-                  }
+                  onChange={(val: string | undefined) => {
+                    void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+                  }}
                   projectId={projectId}
                   disabled={!isEditable}
                   buttonVariant="transparent-with-text"
@@ -302,6 +308,8 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                 />
               </div>
             </div>
+
+            <IssueTotalWorklog workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} />
 
             <IssueWorklogProperty
               workspaceSlug={workspaceSlug}

@@ -211,7 +211,11 @@ export default {
   pages: "Pages",
   intake: "Intake",
   time_tracking: "Time Tracking",
+  log_work: "Log work",
+  worklog_success_saved: "Worklog created successfully.",
   work_management: "Work management",
+  tracked_time: "Tracked time",
+  please_add_duration: "Please add duration",
   projects_and_issues: "Projects and work items",
   projects_and_issues_description: "Toggle these on or off this project.",
   cycles_description:

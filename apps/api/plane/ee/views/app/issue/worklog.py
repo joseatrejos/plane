@@ -21,7 +21,6 @@ from plane.payment.flags.flag_decorator import check_feature_flag
 class IssueWorkLogsEndpoint(BaseAPIView):
     permission_classes = [ProjectEntityPermission]
 
-    @check_feature_flag(FeatureFlag.ISSUE_WORKLOG)
     def post(self, request, slug, project_id, issue_id):
         serializer = IssueWorkLogSerializer(data=request.data)
         if serializer.is_valid():
@@ -36,7 +35,6 @@ class IssueWorkLogsEndpoint(BaseAPIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @check_feature_flag(FeatureFlag.ISSUE_WORKLOG)
     def get(self, request, slug, project_id, issue_id):
         worklogs = IssueWorkLog.objects.filter(
             issue_id=issue_id,
@@ -46,7 +44,6 @@ class IssueWorkLogsEndpoint(BaseAPIView):
         serializer = IssueWorkLogSerializer(worklogs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @check_feature_flag(FeatureFlag.ISSUE_WORKLOG)
     def patch(self, request, slug, project_id, issue_id, pk):
         worklog = IssueWorkLog.objects.get(
             pk=pk, issue_id=issue_id, project_id=project_id, workspace__slug=slug
@@ -63,7 +60,6 @@ class IssueWorkLogsEndpoint(BaseAPIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @check_feature_flag(FeatureFlag.ISSUE_WORKLOG)
     def delete(self, request, slug, project_id, issue_id, pk):
         worklog = IssueWorkLog.objects.get(
             pk=pk, issue_id=issue_id, project_id=project_id, workspace__slug=slug
@@ -79,7 +75,6 @@ class IssueWorkLogsEndpoint(BaseAPIView):
 
 
 class IssueTotalWorkLogEndpoint(BaseAPIView):
-    @check_feature_flag(FeatureFlag.ISSUE_WORKLOG)
     def get(self, request, slug, project_id, issue_id):
         total_worklog = IssueWorkLog.objects.filter(
             issue_id=issue_id,
