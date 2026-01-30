@@ -1,4 +1,4 @@
-import { orderBy, set, uniq } from "lodash-es";
+import { concat, orderBy, set, uniq, update } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // plane package imports
@@ -166,7 +166,7 @@ export class IssueActivityStore implements IIssueActivityStore {
     projectId: string,
     issueId: string,
     loaderType: TActivityLoader = "fetch"
-  ): Promise<TIssueActivity[]> {
+  ) {
     try {
       this.loader = loaderType;
 
@@ -177,35 +177,32 @@ export class IssueActivityStore implements IIssueActivityStore {
         if (currentActivity) props = { created_at__gt: currentActivity.created_at };
       }
 
-      // 1. Forzamos el tipado de la respuesta de la API
-      const [activities, worklogs] = (await Promise.all([
+      // Explicitly type the results of the Promise.all
+      const [activities, worklogs] = await Promise.all([
         this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props),
-        this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId),
-      ])) as [TIssueActivity[], TIssueWorklog[]];
+        this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId) as Promise<TIssueWorklog[]>,
+      ]);
 
-      const activityIds = activities.map((a) => a.id);
+      const activityIds = activities.map((activity) => activity.id);
       const worklogIds = worklogs.map((w) => w.id);
 
       runInAction(() => {
-        // 2. Reemplazamos lodash/update y concat por lógica nativa de TS
-        // Esto evita que la variable se vuelva 'any'
-        const existingIds = this.activities[issueId] || [];
-        this.activities[issueId] = uniq([...existingIds, ...activityIds]);
-
-        // 3. Usamos asignación directa en lugar de lodash/set
+        update(this.activities, issueId, (currentActivityIds) => {
+          if (!currentActivityIds) return activityIds;
+          return uniq(concat(currentActivityIds, activityIds));
+        });
         activities.forEach((activity) => {
-          this.activityMap[activity.id] = activity;
+          set(this.activityMap, activity.id, activity);
         });
 
-        this.worklogs[issueId] = worklogIds;
+        set(this.worklogs, issueId, worklogIds);
         worklogs.forEach((w) => {
-          this.worklogMap[w.id] = w;
+          set(this.worklogMap, w.id, w);
         });
 
         this.loader = undefined;
       });
 
-      // 4. Retornamos la variable original que TS ya sabe que es TIssueActivity[]
       return activities;
     } catch (error) {
       this.loader = undefined;
