@@ -503,6 +503,7 @@ export default {
     guests: "Guests",
     assignees: "Assignees",
     assignee: "Assignee",
+    worklog: "Worklog",
     created_by: "Created by",
     none: "None",
     link: "Link",

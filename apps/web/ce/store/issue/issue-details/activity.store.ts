@@ -1,4 +1,4 @@
-import { concat, orderBy, set, uniq, update } from "lodash-es";
+import { orderBy, set, uniq } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // plane package imports
@@ -30,11 +30,20 @@ export interface IIssueActivityStoreActions {
   ) => Promise<TIssueActivity[]>;
 }
 
+export interface TIssueWorklog {
+  id: string;
+  created_at: string;
+  duration: number;
+  description: string;
+}
+
 export interface IIssueActivityStore extends IIssueActivityStoreActions {
   // observables
   loader: TActivityLoader;
   activities: TIssueActivityIdMap;
   activityMap: TIssueActivityMap;
+  worklogs: TIssueActivityIdMap;
+  worklogMap: Record<string, TIssueWorklog>;
   // helper methods
   getActivitiesByIssueId: (issueId: string) => string[] | undefined;
   getActivityById: (activityId: string) => TIssueActivity | undefined;
@@ -46,6 +55,9 @@ export class IssueActivityStore implements IIssueActivityStore {
   loader: TActivityLoader = "fetch";
   activities: TIssueActivityIdMap = {};
   activityMap: TIssueActivityMap = {};
+
+  worklogs: TIssueActivityIdMap = {};
+  worklogMap: Record<string, TIssueWorklog> = {};
   // services
   serviceType;
   issueActivityService;
@@ -59,6 +71,8 @@ export class IssueActivityStore implements IIssueActivityStore {
       loader: observable.ref,
       activities: observable,
       activityMap: observable,
+      worklogs: observable,
+      worklogMap: observable,
       // actions
       fetchActivities: action,
     });
@@ -88,6 +102,8 @@ export class IssueActivityStore implements IIssueActivityStore {
 
     const activities = this.getActivitiesByIssueId(issueId);
     const comments = currentStore.comment.getCommentsByIssueId(issueId);
+
+    const worklogIds = this.worklogs[issueId] || [];
 
     if (!activities || !comments) return undefined;
 
@@ -119,6 +135,18 @@ export class IssueActivityStore implements IIssueActivityStore {
       });
     });
 
+    worklogIds.forEach((worklogId) => {
+      const worklog = this.worklogMap[worklogId];
+      if (!worklog) return;
+      activityComments.push({
+        id: worklog.id,
+        activity_type: EActivityFilterType.WORKLOG, // Este es el tipo que activamos en el filtro
+        created_at: worklog.created_at,
+        duration: worklog.duration, // Pasamos la duración
+        description: worklog.description, // Pasamos la descripción
+      });
+    });
+
     return activityComments;
   }
 
@@ -138,7 +166,7 @@ export class IssueActivityStore implements IIssueActivityStore {
     projectId: string,
     issueId: string,
     loaderType: TActivityLoader = "fetch"
-  ) {
+  ): Promise<TIssueActivity[]> {
     try {
       this.loader = loaderType;
 
@@ -149,25 +177,65 @@ export class IssueActivityStore implements IIssueActivityStore {
         if (currentActivity) props = { created_at__gt: currentActivity.created_at };
       }
 
-      const activities = await this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props);
+      // 1. Forzamos el tipado de la respuesta de la API
+      const [activities, worklogs] = (await Promise.all([
+        this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props),
+        this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId),
+      ])) as [TIssueActivity[], TIssueWorklog[]];
 
-      const activityIds = activities.map((activity) => activity.id);
+      const activityIds = activities.map((a) => a.id);
+      const worklogIds = worklogs.map((w) => w.id);
 
       runInAction(() => {
-        update(this.activities, issueId, (currentActivityIds) => {
-          if (!currentActivityIds) return activityIds;
-          return uniq(concat(currentActivityIds, activityIds));
-        });
+        // 2. Reemplazamos lodash/update y concat por lógica nativa de TS
+        // Esto evita que la variable se vuelva 'any'
+        const existingIds = this.activities[issueId] || [];
+        this.activities[issueId] = uniq([...existingIds, ...activityIds]);
+
+        // 3. Usamos asignación directa en lugar de lodash/set
         activities.forEach((activity) => {
-          set(this.activityMap, activity.id, activity);
+          this.activityMap[activity.id] = activity;
         });
+
+        this.worklogs[issueId] = worklogIds;
+        worklogs.forEach((w) => {
+          this.worklogMap[w.id] = w;
+        });
+
         this.loader = undefined;
       });
 
+      // 4. Retornamos la variable original que TS ya sabe que es TIssueActivity[]
       return activities;
     } catch (error) {
       this.loader = undefined;
       throw error;
+    }
+  }
+
+  public async fetchWorklogs(
+    workspaceSlug: string,
+    projectId: string,
+    issueId: string
+  ): Promise<TIssueWorklog[] | undefined> {
+    try {
+      const worklogs = (await this.issueActivityService.getIssueWorklogs(
+        workspaceSlug,
+        projectId,
+        issueId
+      )) as TIssueWorklog[];
+
+      runInAction(() => {
+        const ids = worklogs.map((w) => w.id);
+        set(this.worklogs, issueId, ids);
+        worklogs.forEach((w) => {
+          set(this.worklogMap, w.id, w);
+        });
+      });
+      return worklogs;
+    } catch (error) {
+      console.error("Error al cargar worklogs en el store", error);
+      return undefined;
     }
   }
 }

@@ -9,14 +9,17 @@ export type TIssueTotalWorklog = {
   workspaceSlug: string;
   projectId: string;
   issueId: string;
+  labelClassName?: string;
+  gapClassName?: string;
 };
-
 interface ITotalWorklogResponse {
   total_worklog: number;
 }
 
 export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
-  const { workspaceSlug, projectId, issueId } = props;
+  // Set defaults that match your "Sidebar" (w-1/4)
+  const { workspaceSlug, projectId, issueId, labelClassName = "w-1/4", gapClassName = "gap-3" } = props;
+
   const { t } = useTranslation();
   const [totalMinutes, setTotalMinutes] = useState<number | null>(null);
 
@@ -33,12 +36,9 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
   }, [workspaceSlug, projectId, issueId]);
 
   useEffect(() => {
-    // Definimos una función interna para el inicio
     const initiateFetch = async () => {
       await fetchTotal();
     };
-
-    // Usamos void para ejecutarla
     void initiateFetch();
 
     const handleUpdate = () => {
@@ -46,7 +46,6 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
     };
 
     window.addEventListener("worklog_updated", handleUpdate);
-
     return () => {
       window.removeEventListener("worklog_updated", handleUpdate);
     };
@@ -58,14 +57,16 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
   const minutes = totalMinutes % 60;
 
   return (
-    <div className="flex min-h-8 gap-2">
-      <div className="flex w-2/5 flex-shrink-0 gap-1 pt-2 text-sm text-custom-text-300">
+    <div className={`flex w-full items-center ${gapClassName} min-h-8`}>
+      <div className={`flex items-center gap-1 flex-shrink-0 text-sm text-custom-text-300 ${labelClassName}`}>
         <Icon name="project.clock" className="h-4 w-4 flex-shrink-0" />
         <span>{t("tracked_time") || "Total worklog"}</span>
       </div>
 
-      <div className="h-full min-h-8 w-3/5 flex-grow pt-2 text-sm font-medium text-custom-text-100">
-        {hours}h {minutes}m
+      <div className="flex flex-grow flex-col gap-3 truncate">
+        <div className="px-2 text-sm text-custom-text-200">
+          {hours}h {minutes}m
+        </div>
       </div>
     </div>
   );

@@ -676,6 +676,7 @@ export default {
     label: "Etiqueta",
     assignees: "Asignados",
     assignee: "Asignado",
+    worklog: "Registro de trabajo",
     created_by: "Creado por",
     none: "Ninguno",
     link: "Enlace",

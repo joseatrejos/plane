@@ -307,6 +307,7 @@ export enum EActivityFilterType {
   COMMENT = "COMMENT",
   STATE = "STATE",
   ASSIGNEE = "ASSIGNEE",
+  WORKLOG = "WORKLOG",
   DEFAULT = "DEFAULT",
 }
 
@@ -326,6 +327,9 @@ export const ACTIVITY_FILTER_TYPE_OPTIONS: Record<TActivityFilterOptionsKey, { l
   },
   [EActivityFilterType.ASSIGNEE]: {
     labelTranslationKey: "common.assignee",
+  },
+  [EActivityFilterType.WORKLOG]: {
+    labelTranslationKey: "common.worklog",
   },
 };
 
@@ -347,9 +351,9 @@ export const filterActivityOnSelectedFilters = (
   activity: TIssueActivityComment[],
   filters: TActivityFilters[]
 ): TIssueActivityComment[] =>
-  activity.filter((activity) => {
-    if (activity.activity_type === EActivityFilterType.DEFAULT) return true;
-    return filters.includes(activity.activity_type as TActivityFilters);
-  });
+  activity.filter((activityItem) => {
+    if ((activityItem.activity_type as EActivityFilterType) === EActivityFilterType.DEFAULT) return true;
 
+    return filters.includes(activityItem.activity_type as TActivityFilters);
+  });
 export const ENABLE_ISSUE_DEPENDENCIES = false;

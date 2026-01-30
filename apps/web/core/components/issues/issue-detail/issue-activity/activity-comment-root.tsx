@@ -9,7 +9,7 @@ import { CommentCard } from "@/components/comments/card/root";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 // plane web components
 import { IssueAdditionalPropertiesActivity } from "@/plane-web/components/issues/issue-details/issue-properties-activity";
-import { IssueActivityWorklog } from "@/plane-web/components/issues/worklog/activity/root";
+import { IssueActivityWorklog } from "./activity/actions/worklog";
 // local imports
 import { IssueActivityItem } from "./activity/activity-list";
 import { IssueActivityLoader } from "./loader";
@@ -52,6 +52,7 @@ export const IssueActivityCommentRoot = observer(function IssueActivityCommentRo
 
   const filteredActivityAndComments = filterActivityOnSelectedFilters(activityAndComments, selectedFilters);
 
+  // QUITA WORKLOG DE AQUÍ
   const BASE_ACTIVITY_FILTER_TYPES = [
     EActivityFilterType.ACTIVITY,
     EActivityFilterType.STATE,
@@ -63,42 +64,58 @@ export const IssueActivityCommentRoot = observer(function IssueActivityCommentRo
     <div>
       {filteredActivityAndComments.map((activityComment, index) => {
         const comment = getCommentById(activityComment.id);
-        return activityComment.activity_type === "COMMENT" ? (
-          <CommentCard
-            key={activityComment.id}
-            workspaceSlug={workspaceSlug}
-            comment={comment}
-            activityOperations={activityOperations}
-            ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
-            showAccessSpecifier={!!showAccessSpecifier}
-            showCopyLinkOption={!isIntakeIssue}
-            disabled={disabled}
-            projectId={projectId}
-          />
-        ) : BASE_ACTIVITY_FILTER_TYPES.includes(activityComment.activity_type as EActivityFilterType) ? (
-          <IssueActivityItem
-            key={activityComment.id}
-            activityId={activityComment.id}
-            ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
-          />
-        ) : activityComment.activity_type === "ISSUE_ADDITIONAL_PROPERTIES_ACTIVITY" ? (
-          <IssueAdditionalPropertiesActivity
-            key={activityComment.id}
-            activityId={activityComment.id}
-            ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
-          />
-        ) : activityComment.activity_type === "WORKLOG" ? (
-          <IssueActivityWorklog
-            key={activityComment.id}
-            workspaceSlug={workspaceSlug}
-            projectId={projectId}
-            issueId={issueId}
-            activityComment={activityComment}
-            ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
-          />
-        ) : (
-          <></>
-        );
+
+        if (activityComment.activity_type === "WORKLOG") {
+          console.log("Rendering worklog activity:", activityComment);
+          return (
+            <IssueActivityWorklog
+              key={activityComment.id}
+              workspaceSlug={workspaceSlug}
+              projectId={projectId}
+              issueId={issueId}
+              activityComment={activityComment}
+              ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
+            />
+          );
+        }
+
+        if (activityComment.activity_type === "COMMENT") {
+          return (
+            <CommentCard
+              key={activityComment.id}
+              workspaceSlug={workspaceSlug}
+              comment={comment}
+              activityOperations={activityOperations}
+              ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
+              showAccessSpecifier={!!showAccessSpecifier}
+              showCopyLinkOption={!isIntakeIssue}
+              disabled={disabled}
+              projectId={projectId}
+            />
+          );
+        }
+
+        if (BASE_ACTIVITY_FILTER_TYPES.includes(activityComment.activity_type as EActivityFilterType)) {
+          return (
+            <IssueActivityItem
+              key={activityComment.id}
+              activityId={activityComment.id}
+              ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
+            />
+          );
+        }
+
+        if (activityComment.activity_type === "ISSUE_ADDITIONAL_PROPERTIES_ACTIVITY") {
+          return (
+            <IssueAdditionalPropertiesActivity
+              key={activityComment.id}
+              activityId={activityComment.id}
+              ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
+            />
+          );
+        }
+
+        return null;
       })}
     </div>
   );

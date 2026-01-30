@@ -1,4 +1,3 @@
-import type { FC } from "react";
 import { observer } from "mobx-react";
 // i18n
 import { useTranslation } from "@plane/i18n";
@@ -39,6 +38,7 @@ import type { TIssueOperations } from "../issue-detail";
 import { IssueCycleSelect } from "../issue-detail/cycle-select";
 import { IssueLabel } from "../issue-detail/label";
 import { IssueModuleSelect } from "../issue-detail/module-select";
+import { IssueTotalWorklog } from "../issue-detail/issue-worklog";
 
 interface IPeekOverviewProperties {
   workspaceSlug: string;
@@ -85,7 +85,9 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
           <StateDropdown
             value={issue?.state_id}
-            onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val })}
+            onChange={(val) => {
+              void issueOperations.update(workspaceSlug, projectId, issueId, { state_id: val });
+            }}
             projectId={projectId}
             disabled={disabled}
             buttonVariant="transparent-with-text"
@@ -105,7 +107,9 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
           <MemberDropdown
             value={issue?.assignee_ids ?? undefined}
-            onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val })}
+            onChange={(val) => {
+              void issueOperations.update(workspaceSlug, projectId, issueId, { assignee_ids: val });
+            }}
             disabled={disabled}
             projectId={projectId}
             placeholder={t("issue.add.assignee")}
@@ -128,7 +132,9 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
           <PriorityDropdown
             value={issue?.priority}
-            onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { priority: val })}
+            onChange={(val) => {
+              void issueOperations.update(workspaceSlug, projectId, issueId, { priority: val });
+            }}
             disabled={disabled}
             buttonVariant="border-with-text"
             className="w-3/4 flex-grow rounded px-2 hover:bg-custom-background-80 group"
@@ -164,11 +170,11 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
           <DateDropdown
             value={issue.start_date}
-            onChange={(val) =>
-              issueOperations.update(workspaceSlug, projectId, issueId, {
+            onChange={(val) => {
+              void issueOperations.update(workspaceSlug, projectId, issueId, {
                 start_date: val ? renderFormattedPayloadDate(val) : null,
-              })
-            }
+              });
+            }}
             placeholder={t("issue.add.start_date")}
             buttonVariant="transparent-with-text"
             maxDate={maxDate ?? undefined}
@@ -192,11 +198,11 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           <div className="flex items-center gap-2">
             <DateDropdown
               value={issue.target_date}
-              onChange={(val) =>
-                issueOperations.update(workspaceSlug, projectId, issueId, {
+              onChange={(val) => {
+                void issueOperations.update(workspaceSlug, projectId, issueId, {
                   target_date: val ? renderFormattedPayloadDate(val) : null,
-                })
-              }
+                });
+              }}
               placeholder={t("issue.add.due_date")}
               buttonVariant="transparent-with-text"
               minDate={minDate ?? undefined}
@@ -225,7 +231,9 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
             </div>
             <EstimateDropdown
               value={issue.estimate_point ?? undefined}
-              onChange={(val) => issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val })}
+              onChange={(val) => {
+                void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+              }}
               projectId={projectId}
               disabled={disabled}
               buttonVariant="transparent-with-text"
@@ -301,6 +309,15 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
             <IssueLabel workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} disabled={disabled} />
           </div>
         </div>
+
+        <IssueTotalWorklog
+          workspaceSlug={workspaceSlug}
+          projectId={projectId}
+          issueId={issueId}
+          // Default is already w-1/4, so you don't strictly need to pass it, but to be safe:
+          labelClassName="w-1/4"
+          gapClassName="gap-3"
+        />
 
         <IssueWorklogProperty
           workspaceSlug={workspaceSlug}

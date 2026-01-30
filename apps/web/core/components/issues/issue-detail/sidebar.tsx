@@ -309,7 +309,13 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </div>
             </div>
 
-            <IssueTotalWorklog workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} />
+            <IssueTotalWorklog
+              workspaceSlug={workspaceSlug}
+              projectId={projectId}
+              issueId={issueId}
+              labelClassName="w-2/5"
+              gapClassName="gap-2"
+            />
 
             <IssueWorklogProperty
               workspaceSlug={workspaceSlug}
