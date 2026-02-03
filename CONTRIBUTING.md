@@ -69,10 +69,14 @@ chmod +x setup.sh
 ```
 
 3. Start the containers
-   > **Note:** We use `--build` to ensure any new migrations or requirements in the dockerfile.dev are processed.
+   > **Note:** Use `--build` flag the first time or when new migrations or requirements are added to dockerfile.dev. For subsequent runs without changes, you can omit the `--build` flag.
 
 ```bash
+# First time or after adding migrations/requirements
 docker compose -f docker-compose-local.yml up --build
+
+# Subsequent runs (if no changes to dockerfile.dev)
+docker compose -f docker-compose-local.yml up
 ```
 
 4. Start web apps:
