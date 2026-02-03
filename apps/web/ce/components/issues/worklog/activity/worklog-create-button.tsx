@@ -8,17 +8,23 @@ import { useTranslation } from "@plane/i18n";
 import { Icon } from "@plane/propel/icons";
 import { API_BASE_URL } from "@plane/constants";
 import { setToast, TOAST_TYPE } from "@plane/propel/toast";
+import { useIssueDetail } from "@/hooks/store/use-issue-detail";
+import type { TIssueWorklog } from "@/plane-web/store/issue/issue-details/activity.store";
 
 type Props = {
   workspaceSlug?: string;
   projectId?: string;
   issueId?: string;
   disabled?: boolean;
+  onCreated?: () => void;
 };
 
 export function IssueActivityWorklogCreateButton(props: Props) {
-  const { disabled, workspaceSlug, projectId, issueId } = props;
+  const { disabled, workspaceSlug, projectId, issueId, onCreated } = props;
   const { t } = useTranslation();
+  const {
+    activity: { addWorklog },
+  } = useIssueDetail();
 
   const [hours, setHours] = useState<string>("");
   const [minutes, setMinutes] = useState<string>("");
@@ -49,9 +55,11 @@ export function IssueActivityWorklogCreateButton(props: Props) {
 
     try {
       const payload = { duration, description };
-      await axios.post(url, payload, { withCredentials: true });
+      const response = await axios.post<TIssueWorklog>(url, payload, { withCredentials: true });
 
+      if (issueId) addWorklog(issueId, response.data);
       window.dispatchEvent(new CustomEvent("worklog_updated"));
+      onCreated?.();
 
       setToast({
         type: TOAST_TYPE.SUCCESS,

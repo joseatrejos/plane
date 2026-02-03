@@ -28,6 +28,9 @@ export interface IIssueActivityStoreActions {
     issueId: string,
     loaderType?: TActivityLoader
   ) => Promise<TIssueActivity[]>;
+  fetchWorklogs: (workspaceSlug: string, projectId: string, issueId: string) => Promise<TIssueWorklog[] | undefined>;
+  addWorklog: (issueId: string, worklog: TIssueWorklog) => void;
+  removeWorklog: (issueId: string, worklogId: string) => void;
 }
 
 export interface TIssueWorklog {
@@ -35,6 +38,8 @@ export interface TIssueWorklog {
   created_at: string;
   duration: number;
   description: string;
+  created_by?: string;
+  logged_by?: string;
 }
 
 export interface IIssueActivityStore extends IIssueActivityStoreActions {
@@ -47,6 +52,7 @@ export interface IIssueActivityStore extends IIssueActivityStoreActions {
   // helper methods
   getActivitiesByIssueId: (issueId: string) => string[] | undefined;
   getActivityById: (activityId: string) => TIssueActivity | undefined;
+  getWorklogById: (worklogId: string) => TIssueWorklog | undefined;
   getActivityAndCommentsByIssueId: (issueId: string, sortOrder: E_SORT_ORDER) => TIssueActivityComment[] | undefined;
 }
 
@@ -75,6 +81,8 @@ export class IssueActivityStore implements IIssueActivityStore {
       worklogMap: observable,
       // actions
       fetchActivities: action,
+      addWorklog: action,
+      removeWorklog: action,
     });
     this.serviceType = serviceType;
     // services
@@ -90,6 +98,35 @@ export class IssueActivityStore implements IIssueActivityStore {
   getActivityById = (activityId: string) => {
     if (!activityId) return undefined;
     return this.activityMap[activityId] ?? undefined;
+  };
+
+  getWorklogById = (worklogId: string) => {
+    if (!worklogId) return undefined;
+    return this.worklogMap[worklogId] ?? undefined;
+  };
+
+  addWorklog = (issueId: string, worklog: TIssueWorklog) => {
+    if (!issueId || !worklog?.id) return;
+    const currentIds = this.worklogs[issueId] ?? [];
+    set(this.worklogs, issueId, uniq(concat(currentIds, [worklog.id])));
+    set(this.worklogMap, worklog.id, worklog);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("worklog_updated"));
+    }
+  };
+
+  removeWorklog = (issueId: string, worklogId: string) => {
+    if (!issueId || !worklogId) return;
+    const currentIds = this.worklogs[issueId] ?? [];
+    set(
+      this.worklogs,
+      issueId,
+      currentIds.filter((id) => id !== worklogId)
+    );
+    if (this.worklogMap[worklogId]) delete this.worklogMap[worklogId];
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("worklog_updated"));
+    }
   };
 
   protected buildActivityAndCommentItems(issueId: string): TIssueActivityComment[] | undefined {
@@ -144,6 +181,8 @@ export class IssueActivityStore implements IIssueActivityStore {
         created_at: worklog.created_at,
         duration: worklog.duration, // Pasamos la duración
         description: worklog.description, // Pasamos la descripción
+        created_by: worklog.created_by,
+        logged_by: worklog.logged_by,
       });
     });
 
@@ -179,7 +218,9 @@ export class IssueActivityStore implements IIssueActivityStore {
 
       // Explicitly type the results of the Promise.all
       const [activities, worklogs] = await Promise.all([
-        this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props),
+        this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props) as Promise<
+          TIssueActivity[]
+        >,
         this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId) as Promise<TIssueWorklog[]>,
       ]);
 
@@ -202,6 +243,9 @@ export class IssueActivityStore implements IIssueActivityStore {
 
         this.loader = undefined;
       });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("worklog_updated"));
+      }
 
       return activities;
     } catch (error) {
@@ -229,6 +273,9 @@ export class IssueActivityStore implements IIssueActivityStore {
           set(this.worklogMap, w.id, w);
         });
       });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("worklog_updated"));
+      }
       return worklogs;
     } catch (error) {
       console.error("Error al cargar worklogs en el store", error);

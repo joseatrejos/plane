@@ -40,7 +40,7 @@ export const IssueActivityCommentRoot = observer(function IssueActivityCommentRo
   } = props;
   // store hooks
   const {
-    activity: { getActivityAndCommentsByIssueId },
+    activity: { getActivityAndCommentsByIssueId, getWorklogById },
     comment: { getCommentById },
   } = useIssueDetail();
   // derived values
@@ -63,23 +63,23 @@ export const IssueActivityCommentRoot = observer(function IssueActivityCommentRo
   return (
     <div>
       {filteredActivityAndComments.map((activityComment, index) => {
-        const comment = getCommentById(activityComment.id);
-
         if (activityComment.activity_type === "WORKLOG") {
-          console.log("Rendering worklog activity:", activityComment);
+          const worklog = getWorklogById(activityComment.id);
           return (
             <IssueActivityWorklog
               key={activityComment.id}
               workspaceSlug={workspaceSlug}
               projectId={projectId}
               issueId={issueId}
-              activityComment={activityComment}
+              activityComment={worklog ?? activityComment}
               ends={index === 0 ? "top" : index === filteredActivityAndComments.length - 1 ? "bottom" : undefined}
             />
           );
         }
 
         if (activityComment.activity_type === "COMMENT") {
+          const comment = getCommentById(activityComment.id);
+
           return (
             <CommentCard
               key={activityComment.id}
