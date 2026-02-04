@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import Script from "next/script";
 
 // styles
@@ -76,12 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div id="context-menu-portal" />
         <div id="editor-portal" />
         <AppProvider>
-          <div
-            className={cn(
-              "h-screen w-full overflow-hidden bg-custom-background-100 relative flex flex-col",
-              "app-container"
-            )}
-          >
+          <div className={cn("h-screen w-full overflow-hidden relative flex flex-col", "app-container")}>
             <main className="w-full h-full overflow-hidden relative">{children}</main>
           </div>
         </AppProvider>

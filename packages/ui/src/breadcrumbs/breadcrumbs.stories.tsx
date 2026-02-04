@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import type { Meta, StoryObj } from "@storybook/react";
 import { Home, Settings, Briefcase, GridIcon, Layers2, FileIcon } from "lucide-react";
 import * as React from "react";
@@ -25,7 +31,7 @@ function BreadcrumbBlock(props: TBreadcrumbBlockProps) {
   return (
     <>
       <Breadcrumbs.ItemWrapper label={label} disableTooltip={disableTooltip}>
-        {icon && <div className="flex size-4 items-center justify-center overflow-hidden !text-[1rem]">{icon}</div>}
+        {icon && <div className="flex size-4 items-center justify-center overflow-hidden !text-16">{icon}</div>}
         {label && <div className="relative line-clamp-1 block max-w-[150px] overflow-hidden truncate">{label}</div>}
       </Breadcrumbs.ItemWrapper>
     </>

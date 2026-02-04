@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { observer } from "mobx-react";
 import Link from "next/link";
 import { useTheme } from "next-themes";
@@ -47,7 +53,7 @@ export const InstanceProvider = observer(function InstanceProvider({ children }:
           <div className="container h-[110px] flex-shrink-0 mx-auto px-5 lg:px-0 flex items-center justify-between gap-5 z-50">
             <div className="flex items-center gap-x-2 py-10">
               <Link href={`${SPACE_BASE_PATH}/`}>
-                <PlaneLockup className="h-7 w-auto text-custom-text-100" />
+                <PlaneLockup className="h-7 w-auto text-primary" />
               </Link>
             </div>
           </div>

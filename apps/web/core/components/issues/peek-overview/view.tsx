@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import type { FC } from "react";
 import { useRef, useState } from "react";
 import { observer } from "mobx-react";
@@ -114,7 +120,7 @@ export const IssueView = observer(function IssueView(props: IIssueView) {
 
   const peekOverviewIssueClassName = cn(
     !embedIssue
-      ? "absolute z-[25] flex flex-col overflow-hidden rounded border border-custom-border-200 bg-custom-background-100 transition-all duration-300"
+      ? "absolute z-[25] flex flex-col overflow-hidden rounded-sm border border-subtle bg-surface-1 transition-all duration-300"
       : `w-full h-full`,
     !embedIssue && {
       "top-0 bottom-0 right-0 w-full md:w-[50%] border-0 border-l": peekMode === "side-peek",
@@ -128,7 +134,7 @@ export const IssueView = observer(function IssueView(props: IIssueView) {
   const portalContainer = document.getElementById("full-screen-portal") as HTMLElement;
 
   const content = (
-    <div className="w-full !text-base">
+    <div className="w-full text-body-sm-regular">
       {issueId && (
         <div
           ref={issuePeekOverviewRef}
@@ -241,7 +247,7 @@ export const IssueView = observer(function IssueView(props: IIssueView) {
                       </div>
                     </div>
                     <div
-                      className={`h-full !w-[400px] flex-shrink-0 border-l border-custom-border-200 p-4 py-5 overflow-hidden vertical-scrollbar scrollbar-sm ${
+                      className={`h-full !w-[400px] flex-shrink-0 border-l border-subtle p-4 py-5 overflow-hidden vertical-scrollbar scrollbar-sm ${
                         is_archived ? "pointer-events-none" : ""
                       }`}
                     >

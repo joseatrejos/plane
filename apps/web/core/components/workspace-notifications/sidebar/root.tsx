@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useCallback } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -52,12 +58,12 @@ export const NotificationsSidebarRoot = observer(function NotificationsSidebarRo
   return (
     <div
       className={cn(
-        "relative border-0 md:border-r border-custom-border-200 z-[10] flex-shrink-0 bg-custom-background-100 h-full transition-all max-md:overflow-hidden",
+        "relative border-0 md:border-r border-subtle z-[10] flex-shrink-0 bg-surface-1 h-full transition-all max-md:overflow-hidden",
         currentSelectedNotificationId ? "w-0 md:w-3/12" : "w-full md:w-3/12"
       )}
     >
       <div className="relative w-full h-full flex flex-col">
-        <Row className="h-header border-b border-custom-border-200 flex flex-shrink-0">
+        <Row className="h-header border-b border-subtle flex flex-shrink-0">
           <NotificationSidebarHeader workspaceSlug={workspaceSlug.toString()} />
         </Row>
 
@@ -70,10 +76,11 @@ export const NotificationsSidebarRoot = observer(function NotificationsSidebarRo
             >
               <div
                 className={cn(
-                  `relative h-full flex justify-center items-center gap-1 text-sm transition-all`,
-                  currentNotificationTab === tab.value
-                    ? "text-custom-primary-100"
-                    : "text-custom-text-100 hover:text-custom-text-200"
+                  "relative h-full flex justify-center items-center gap-1 text-body-xs-medium transition-all",
+                  {
+                    "text-accent-primary": currentNotificationTab === tab.value,
+                    "text-primary hover:text-secondary": currentNotificationTab !== tab.value,
+                  }
                 )}
               >
                 <div className="font-medium">{t(tab.i18n_label)}</div>
@@ -82,7 +89,7 @@ export const NotificationsSidebarRoot = observer(function NotificationsSidebarRo
                 )}
               </div>
               {currentNotificationTab === tab.value && (
-                <div className="border absolute bottom-0 right-0 left-0 rounded-t-md border-custom-primary-100" />
+                <div className="border absolute bottom-0 right-0 left-0 rounded-t-md border-accent-strong" />
               )}
             </div>
           ))}

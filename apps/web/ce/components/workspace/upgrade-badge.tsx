@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import type { FC } from "react";
 // helpers
 import { useTranslation } from "@plane/i18n";
@@ -16,10 +22,10 @@ export function UpgradeBadge(props: TUpgradeBadge) {
   return (
     <div
       className={cn(
-        "w-fit cursor-pointer rounded-2xl text-custom-primary-200 bg-custom-primary-100/20 text-center font-medium outline-none",
+        "w-fit cursor-pointer rounded-2xl text-accent-secondary bg-accent-primary/20 text-center font-medium outline-none",
         {
-          "text-sm px-3": size === "md",
-          "text-xs px-2": size === "sm",
+          "text-13 px-3": size === "md",
+          "text-11 px-2": size === "sm",
         },
         className
       )}

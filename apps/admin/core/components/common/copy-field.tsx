@@ -1,7 +1,13 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 // ui
-import { Copy } from "lucide-react";
 import { Button } from "@plane/propel/button";
+import { CopyIcon } from "@plane/propel/icons";
 import { TOAST_TYPE, setToast } from "@plane/propel/toast";
 
 type Props = {
@@ -22,9 +28,10 @@ export function CopyField(props: Props) {
 
   return (
     <div className="flex flex-col gap-1">
-      <h4 className="text-sm text-custom-text-200">{label}</h4>
+      <h4 className="text-13 text-secondary">{label}</h4>
       <Button
-        variant="neutral-primary"
+        variant="secondary"
+        size="lg"
         className="flex items-center justify-between py-2"
         onClick={() => {
           navigator.clipboard.writeText(url);
@@ -35,10 +42,10 @@ export function CopyField(props: Props) {
           });
         }}
       >
-        <p className="text-sm font-medium">{url}</p>
-        <Copy size={18} color="#B9B9B9" />
+        <p className="text-13 font-medium">{url}</p>
+        <CopyIcon width={18} height={18} color="#B9B9B9" />
       </Button>
-      <div className="text-xs text-custom-text-300">{description}</div>
+      <div className="text-11 text-tertiary">{description}</div>
     </div>
   );
 }

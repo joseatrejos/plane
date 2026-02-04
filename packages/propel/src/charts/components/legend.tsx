@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 import type { LegendProps } from "recharts";
 // plane imports
@@ -51,7 +57,7 @@ const CustomLegend = React.forwardRef(function CustomLegend(
       {payload.map((item, index) => (
         <div
           key={item.value}
-          className={cn("flex items-center gap-1.5 text-custom-text-300 text-sm font-medium whitespace-nowrap", {
+          className={cn("flex items-center gap-1.5 text-tertiary text-13 font-medium whitespace-nowrap", {
             "px-2": layout === "horizontal",
             "py-2": layout === "vertical",
             "pl-0 pt-0": index === 0,
@@ -63,7 +69,7 @@ const CustomLegend = React.forwardRef(function CustomLegend(
           onMouseLeave={(e) => onMouseLeave?.(item, index, e)}
         >
           <div
-            className="flex-shrink-0 size-2 rounded-sm"
+            className="flex-shrink-0 size-2 rounded-xs"
             style={{
               backgroundColor: item.color,
             }}

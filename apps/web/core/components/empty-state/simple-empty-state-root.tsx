@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { observer } from "mobx-react";
 // utils
 import { cn } from "@plane/utils";
@@ -24,8 +30,8 @@ const sizeConfig = {
 
 const getTitleClassName = (hasDescription: boolean) =>
   cn("font-medium whitespace-pre-line", {
-    "text-sm text-custom-text-400": !hasDescription,
-    "text-lg text-custom-text-300": hasDescription,
+    "text-13 text-placeholder": !hasDescription,
+    "text-16 text-tertiary": hasDescription,
   });
 
 export const SimpleEmptyState = observer(function SimpleEmptyState(props: Props) {
@@ -41,7 +47,7 @@ export const SimpleEmptyState = observer(function SimpleEmptyState(props: Props)
 
       <h3 className={getTitleClassName(!!description)}>{title}</h3>
 
-      {description && <p className="text-base font-medium text-custom-text-400 whitespace-pre-line">{description}</p>}
+      {description && <p className="text-14 font-medium text-placeholder whitespace-pre-line">{description}</p>}
     </div>
   );
 });

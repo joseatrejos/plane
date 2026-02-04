@@ -10,6 +10,7 @@ import { API_BASE_URL } from "@plane/constants";
 import { setToast, TOAST_TYPE } from "@plane/propel/toast";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import type { TIssueWorklog } from "@/plane-web/store/issue/issue-details/activity.store";
+import type { FC } from "react";
 
 type Props = {
   workspaceSlug?: string;

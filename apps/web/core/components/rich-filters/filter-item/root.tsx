@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 import { observer } from "mobx-react";
 // plane imports
@@ -96,8 +102,8 @@ export const FilterItem = observer(function FilterItem<P extends TFilterProperty
         options={operatorOptions}
         className={COMMON_FILTER_ITEM_BORDER_CLASSNAME}
         customButtonClassName={cn(
-          "h-full px-2 text-sm font-normal",
-          isOperatorSelectionDisabled && "hover:bg-custom-background-100"
+          "h-full px-2 text-13 font-regular",
+          isOperatorSelectionDisabled && "hover:bg-layer-2-hover"
         )}
         optionsClassName="w-48"
         maxHeight="2xl"

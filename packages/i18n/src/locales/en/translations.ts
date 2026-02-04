@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 export default {
   submit: "Submit",
   cancel: "Cancel",
@@ -845,7 +851,7 @@ export default {
         label: "Remove parent work item",
       },
     },
-    new: "New Work item",
+    new: "New work item",
     adding: "Adding work item",
     create: {
       success: "Work item created successfully",
@@ -985,7 +991,7 @@ export default {
     delete: "Delete attachment",
   },
   label: {
-    select: "Select label",
+    select: "Add labels",
     create: {
       success: "Label created successfully",
       failed: "Label creation failed",
@@ -1848,6 +1854,43 @@ export default {
         primary_button: "Add estimate system",
       },
     },
+    features: {
+      cycles: {
+        title: "Cycles",
+        short_title: "Cycles",
+        description: "Schedule work in flexible periods that adapt to this project's unique rhythm and pace.",
+        toggle_title: "Enable cycles",
+        toggle_description: "Plan work in focused timeframes.",
+      },
+      modules: {
+        title: "Modules",
+        short_title: "Modules",
+        description: "Organize work into sub-projects with dedicated leads and assignees.",
+        toggle_title: "Enable modules",
+        toggle_description: "Project members will be able to create and edit modules.",
+      },
+      views: {
+        title: "Views",
+        short_title: "Views",
+        description: "Save custom sorts, filters, and display options or share them with your team.",
+        toggle_title: "Enable views",
+        toggle_description: "Project members will be able to create and edit views.",
+      },
+      pages: {
+        title: "Pages",
+        short_title: "Pages",
+        description: "Create and edit free-form content; notes, docs, anything.",
+        toggle_title: "Enable pages",
+        toggle_description: "Project members will be able to create and edit pages.",
+      },
+      intake: {
+        title: "Intake",
+        short_title: "Intake",
+        description: "Let non-members share bugs, feedback, and suggestions; without disrupting your workflow.",
+        toggle_title: "Enable intake",
+        toggle_description: "Let project members create in app intake requests.",
+      },
+    },
   },
   project_cycles: {
     add_cycle: "Add cycle",
@@ -2632,6 +2675,7 @@ export default {
       copy_current_page_url: "Copy current page URL",
       copy_current_page_url_toast_success: "Current page URL copied to clipboard.",
       copy_current_page_url_toast_error: "Some error occurred while copying the current page URL to clipboard.",
+      focus_top_nav_search: "Focus search input",
     },
     preferences_actions: {
       update_theme: "Change interface theme",

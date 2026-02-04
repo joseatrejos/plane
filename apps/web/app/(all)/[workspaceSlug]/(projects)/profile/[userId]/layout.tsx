@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { observer } from "mobx-react";
 import { usePathname } from "next/navigation";
 import { Outlet } from "react-router";
@@ -74,7 +80,7 @@ function UseProfileLayout({ params }: Route.ComponentProps) {
                     <Outlet />
                   </div>
                 ) : (
-                  <div className="grid h-full w-full place-items-center text-custom-text-200">
+                  <div className="grid h-full w-full place-items-center text-secondary">
                     {t("you_do_not_have_the_permission_to_access_this_page")}
                   </div>
                 )}

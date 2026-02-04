@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 // plane imports
 import { LiteTextEditorWithRef } from "@plane/editor";
@@ -59,7 +65,7 @@ export const LiteTextEditor = React.forwardRef(function LiteTextEditor(
   });
 
   return (
-    <div className="border border-custom-border-200 rounded p-3 space-y-3">
+    <div className="border border-subtle rounded-sm p-3 space-y-3">
       <LiteTextEditorWithRef
         ref={ref}
         disabledExtensions={[...liteTextEditorExtensions.disabled, ...additionalDisabledExtensions]}

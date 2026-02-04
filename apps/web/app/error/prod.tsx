@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useTheme } from "next-themes";
 // plane imports
 import { Button } from "@plane/propel/button";
@@ -39,7 +45,7 @@ export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
 
   return (
     <DefaultLayout>
-      <div className="relative container mx-auto h-full w-full max-w-xl flex flex-col gap-2 items-center justify-center gap-y-6 bg-custom-background-100 text-center px-6">
+      <div className="relative container mx-auto h-full w-full max-w-xl flex flex-col gap-2 items-center justify-center gap-y-6 bg-surface-1 text-center px-6">
         <div className="relative w-full">
           <img
             src={maintenanceModeImage}
@@ -51,10 +57,8 @@ export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
         </div>
         <div className="w-full relative flex flex-col gap-4 mt-4">
           <div className="flex flex-col gap-2.5">
-            <h1 className="text-xl font-semibold text-custom-text-100 text-left">
-              &#x1F6A7; Looks like something went wrong!
-            </h1>
-            <span className="text-base font-medium text-custom-text-200 text-left">
+            <h1 className="text-18 font-semibold text-primary text-left">&#x1F6A7; Looks like something went wrong!</h1>
+            <span className="text-14 font-medium text-secondary text-left">
               We track these errors automatically and working on getting things back up and running. If the problem
               persists feel free to contact us. In the meantime, try refreshing.
             </span>
@@ -67,7 +71,7 @@ export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
                   href={link.value}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-custom-primary-100 hover:underline text-sm"
+                  className="text-accent-primary hover:underline text-13"
                 >
                   {link.label}
                 </a>
@@ -76,7 +80,7 @@ export function ProdErrorComponent({ onGoHome }: ProdErrorComponentProps) {
           </div>
 
           <div className="flex items-center justify-start gap-6">
-            <Button variant="primary" size="md" onClick={onGoHome}>
+            <Button variant="primary" size="lg" onClick={onGoHome}>
               Go to home
             </Button>
           </div>

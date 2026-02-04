@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -48,7 +54,7 @@ export const StickiesInfinite = observer(function StickiesInfinite() {
               ref={setElementRef}
               id="intersection-element"
             >
-              <div className="flex w-full rounded min-h-[300px]">
+              <div className="flex w-full rounded-sm min-h-[300px]">
                 <Loader className="w-full h-full">
                   <Loader.Item height="100%" width="100%" />
                 </Loader>

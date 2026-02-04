@@ -1,6 +1,12 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 import { PROJECT_TRACKER_ELEMENTS } from "@plane/constants";
+import { ChevronRightIcon } from "@plane/propel/icons";
 import { EPillVariant, Pill, EPillSize } from "@plane/propel/pill";
 import { ToggleSwitch } from "@plane/ui";
 import { joinUrlPath } from "@plane/utils";
@@ -27,7 +33,7 @@ export function ProjectFeatureToggle(props: Props) {
         >
           {value ? "Enabled" : "Disabled"}
         </Pill>
-        <ChevronRight className="h-4 w-4 text-custom-text-300" />
+        <ChevronRightIcon className="h-4 w-4 text-tertiary" />
       </div>
     </Link>
   ) : (

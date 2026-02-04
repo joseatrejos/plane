@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useState } from "react";
 import { observer } from "mobx-react";
 // plane imports
@@ -32,8 +38,8 @@ export const PageEditorHeaderLogoPicker = observer(function PageEditorHeaderLogo
         buttonClassName="flex items-center justify-center"
         label={
           <div
-            className={cn("-ml-[8px] size-[56px] grid place-items-center rounded transition-colors", {
-              "hover:bg-custom-background-80": isContentEditable,
+            className={cn("-ml-[8px] size-[56px] grid place-items-center rounded-sm transition-colors", {
+              "hover:bg-layer-1": isContentEditable,
             })}
           >
             {isLogoSelected && <Logo logo={logo_props} size={48} type="lucide" />}

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useRef, useState } from "react";
 import { observer } from "mobx-react";
 import { useParams } from "next/navigation";
@@ -76,7 +82,7 @@ export const SidebarQuickActions = observer(function SidebarQuickActions() {
           label={
             <>
               <AddWorkItemIcon className="size-4" />
-              <span className="text-sm font-medium truncate max-w-[145px]">{t("sidebar.new_work_item")}</span>
+              <span className="text-13 font-medium truncate max-w-[145px]">{t("sidebar.new_work_item")}</span>
             </>
           }
           onClick={() => toggleCreateIssueModal(true)}

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { observer } from "mobx-react";
 import { useParams, usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -86,7 +92,7 @@ export const DashboardWidgets = observer(function DashboardWidgets() {
       {!isWikiApp && <NoProjectsEmptyState />}
 
       {isAnyWidgetEnabled ? (
-        <div className="flex flex-col divide-y-[1px] divide-custom-border-100">
+        <div className="flex flex-col">
           {orderedWidgets.map((key) => {
             const WidgetComponent = HOME_WIDGETS_LIST[key]?.component;
             const isEnabled = widgetsMap[key]?.is_enabled;

@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 import { observer } from "mobx-react";
 // plane imports
@@ -16,7 +22,7 @@ export const WorkspaceContentWrapper = observer(function WorkspaceContentWrapper
   const { shouldRenderAppRail } = useAppRailVisibility();
 
   return (
-    <div className="flex flex-col relative size-full overflow-hidden bg-custom-background-90 transition-all ease-in-out duration-300">
+    <div className="flex flex-col relative size-full overflow-hidden bg-canvas transition-all ease-in-out duration-300">
       <TopNavigationRoot />
       <div className="relative flex size-full overflow-hidden">
         {/* Conditionally render AppRailRoot based on context */}
@@ -25,7 +31,7 @@ export const WorkspaceContentWrapper = observer(function WorkspaceContentWrapper
           className={cn(
             "relative size-full pl-2 pb-2 pr-2 flex-grow transition-all ease-in-out duration-300 overflow-hidden",
             {
-              "pl-0": shouldRenderAppRail,
+              "pl-0!": shouldRenderAppRail,
             }
           )}
         >

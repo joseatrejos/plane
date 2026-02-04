@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import type { Editor } from "@tiptap/core";
 // constants
 import { CORE_EXTENSIONS } from "@/constants/extension";
@@ -13,7 +19,7 @@ export const constructDragPreviewTable = (): {
 } => {
   const tableElement = document.createElement("table");
   tableElement.classList.add("table-drag-preview");
-  tableElement.classList.add("bg-custom-background-100");
+  tableElement.classList.add("bg-surface-1");
   tableElement.style.opacity = "0.9";
   const tableBodyElement = document.createElement("tbody");
   tableElement.appendChild(tableBodyElement);

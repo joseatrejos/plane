@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React from "react";
 // ui
 import { Loader } from "@plane/ui";
@@ -6,7 +12,7 @@ import { InboxSidebarLoader } from "./inbox-sidebar-loader";
 export function InboxLayoutLoader() {
   return (
     <div className="relative w-full h-full flex overflow-hidden">
-      <div className="flex-shrink-0 w-2/6 h-full border-r border-custom-border-300">
+      <div className="flex-shrink-0 w-2/6 h-full border-r border-strong">
         <InboxSidebarLoader />
       </div>
       <div className="w-4/6">

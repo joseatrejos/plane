@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import React, { useEffect, useState } from "react";
 import { observer } from "mobx-react";
 import { OctagonAlert } from "lucide-react";
@@ -69,7 +75,7 @@ export const CreateOrJoinWorkspaces = observer(function CreateOrJoinWorkspaces(p
               />
             ) : (
               <div className="flex h-96 w-full items-center justify-center">
-                <div className="flex gap-2.5 w-full items-start justify-center text-sm leading-5 mt-4 px-6 py-4 rounded border border-custom-primary-100/20 bg-custom-primary-100/10 text-custom-primary-200">
+                <div className="flex gap-2.5 w-full items-start justify-center text-13 leading-5 mt-4 px-6 py-4 rounded-sm border border-accent-strong/20 bg-accent-primary/10 text-accent-secondary">
                   <OctagonAlert className="flex-shrink-0 size-5 mt-1" />
                   <span>
                     You don&apos;t seem to have any invites to a workspace and your instance admin has restricted

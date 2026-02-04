@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import type { FC } from "react";
 import React, { useEffect } from "react";
 import { observer } from "mobx-react";
@@ -181,7 +187,7 @@ export const TabNavigationRoot = observer(function TabNavigationRoot(props: TTab
           </div>
         </div>
 
-        <div className="shrink-0 h-5 w-1 border-l border-custom-border-200" />
+        <div className="shrink-0 h-5 w-1 border-l border-subtle" />
 
         <div ref={containerRef} className="flex items-center h-full flex-1 min-w-0 overflow-hidden">
           <TabNavigationList className="h-full">

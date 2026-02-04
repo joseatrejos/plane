@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { useRef } from "react";
 //types
 import { observer } from "mobx-react";
@@ -30,7 +36,7 @@ export const SpreadsheetHeaderColumn = observer(function SpreadsheetHeaderColumn
       shouldRenderProperty={() => shouldRenderProperty}
     >
       <th
-        className="h-11 min-w-36 items-center bg-custom-background-90 text-sm font-medium py-1 border border-b-0 border-t-0 border-custom-border-100"
+        className="h-11 min-w-36 items-center bg-layer-1 text-13 font-medium py-1 border border-b-0 border-t-0 border-subtle"
         ref={tableHeaderCellRef}
         tabIndex={0}
       >

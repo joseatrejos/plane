@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 // components
 import { observer } from "mobx-react";
 import { useParams, usePathname } from "next/navigation";
@@ -40,7 +46,7 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
 
   return (
     <div
-      className={cn("flex items-center min-h-11 w-full px-3.5 z-[27] transition-all duration-300", {
+      className={cn("flex items-center min-h-10 w-full px-3.5 bg-canvas z-[27] transition-all duration-300", {
         "px-2": !showLabel,
       })}
     >
@@ -63,7 +69,7 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
                 <div className="relative">
                   <InboxIcon className="size-5" />
                   {totalNotifications > 0 && (
-                    <span className="absolute -top-0 -right-0 size-2 rounded-full bg-red-500" />
+                    <span className="absolute top-0 right-0 size-2 rounded-full bg-danger-primary" />
                   )}
                 </div>
               ),
@@ -73,8 +79,8 @@ export const TopNavigationRoot = observer(function TopNavigationRoot() {
         </Tooltip>
         <HelpMenuRoot />
         <StarUsOnGitHubLink />
-        <div className="flex items-center justify-center size-8 hover:bg-custom-background-80 rounded-md">
-          <UserMenuRoot size="xs" />
+        <div className="flex items-center justify-center size-8 hover:bg-layer-1-hover rounded-md">
+          <UserMenuRoot />
         </div>
       </div>
     </div>

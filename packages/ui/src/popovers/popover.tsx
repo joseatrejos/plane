@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { Popover as HeadlessReactPopover, Transition } from "@headlessui/react";
 import { EllipsisVertical } from "lucide-react";
 import type { Ref } from "react";
@@ -45,7 +51,7 @@ export function Popover(props: TPopover) {
           ref={popoverButtonRef as Ref<HTMLButtonElement>}
           className={cn(
             {
-              "flex justify-center items-center text-base h-6 w-6 rounded transition-all bg-custom-background-90 hover:bg-custom-background-80":
+              "flex justify-center items-center text-14 h-6 w-6 rounded-sm transition-all bg-surface-2 hover:bg-layer-1":
                 !button,
             },
             buttonClassName

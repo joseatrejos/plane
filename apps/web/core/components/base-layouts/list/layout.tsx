@@ -1,3 +1,9 @@
+/**
+ * Copyright (c) 2023-present Plane Software, Inc. and contributors
+ * SPDX-License-Identifier: AGPL-3.0-only
+ * See the LICENSE file for details.
+ */
+
 import { observer } from "mobx-react";
 import type { IBaseLayoutsListItem, IBaseLayoutsListProps } from "@plane/types";
 import { cn } from "@plane/ui";
@@ -37,7 +43,7 @@ export const BaseListLayout = observer(function BaseListLayout<T extends IBaseLa
   );
 
   return (
-    <div ref={containerRef} className={cn("relative size-full overflow-auto bg-custom-background-90", className)}>
+    <div ref={containerRef} className={cn("relative size-full overflow-auto bg-surface-1", className)}>
       <div className="relative size-full flex flex-col">
         {groups.map((group) => {
           const itemIds = groupedItemIds[group.id] || [];
