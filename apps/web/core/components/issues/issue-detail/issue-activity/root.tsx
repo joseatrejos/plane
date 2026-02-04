@@ -1,10 +1,4 @@
-/**
- * Copyright (c) 2023-present Plane Software, Inc. and contributors
- * SPDX-License-Identifier: AGPL-3.0-only
- * See the LICENSE file for details.
- */
-
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import uniq from "lodash-es/uniq";
 import { observer } from "mobx-react";
 // plane package imports
@@ -56,6 +50,7 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
   // store hooks
   const {
     issue: { getIssueById },
+    activity: { fetchWorklogs },
   } = useIssueDetail();
 
   const { getProjectRoleByWorkspaceSlugAndProjectId } = useUserPermissions();
@@ -102,13 +97,25 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
     ),
     [workspaceSlug, issueId, activityOperations, projectId]
   );
+  useEffect(() => {
+    if (!workspaceSlug || !projectId || !issueId) return;
+    const handleWorklogUpdated = () => {
+      void fetchWorklogs(workspaceSlug, projectId, issueId);
+    };
+
+    window.addEventListener("worklog_updated", handleWorklogUpdated);
+    return () => {
+      window.removeEventListener("worklog_updated", handleWorklogUpdated);
+    };
+  }, [fetchWorklogs, workspaceSlug, projectId, issueId]);
+
   if (!project) return <></>;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 pt-3">
       {/* header */}
       <div className="flex items-center justify-between">
-        <div className="text-h5-medium text-primary">{t("common.activity")}</div>
+        <div className="text-lg text-custom-text-100">{t("common.activity")}</div>
         <div className="flex items-center gap-2">
           {isWorklogButtonEnabled && (
             <IssueActivityWorklogCreateButton
@@ -116,6 +123,9 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
               projectId={projectId}
               issueId={issueId}
               disabled={disabled}
+              onCreated={() => {
+                void fetchWorklogs(workspaceSlug, projectId, issueId);
+              }}
             />
           )}
           <ActivitySortRoot sortOrder={sortOrder || E_SORT_ORDER.ASC} toggleSort={toggleSortOrder} />

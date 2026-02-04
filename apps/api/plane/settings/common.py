@@ -52,11 +52,16 @@ INSTALLED_APPS = [
     "plane.middleware",
     "plane.license",
     "plane.api",
+    "plane.ee",
     "plane.authentication",
     # Third-party things
     "rest_framework",
     "corsheaders",
     "django_celery_beat",
+    "oauth2_provider",
+    "pgtrigger",
+
+
 ]
 
 # Middlewares
@@ -73,6 +78,7 @@ MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
     "plane.middleware.request_body_size.RequestBodySizeLimitMiddleware",
     "plane.middleware.logger.APITokenLogMiddleware",
+    "oauth2_provider.middleware.OAuth2TokenMiddleware",
     "plane.middleware.logger.RequestLoggerMiddleware",
 ]
 
@@ -114,6 +120,84 @@ TEMPLATES = [
         },
     }
 ]
+
+
+# Oauth Provider Settings
+from plane.authentication.utils import is_pkce_required 
+
+OAUTH2_PROVIDER_ACCESS_TOKEN_MODEL = "authentication.AccessToken"
+OAUTH2_PROVIDER_APPLICATION_MODEL = "authentication.Application"
+OAUTH2_PROVIDER_GRANT_MODEL = "authentication.Grant"
+OAUTH2_PROVIDER_REFRESH_TOKEN_MODEL = "authentication.RefreshToken"
+OAUTH2_PROVIDER_ID_TOKEN_MODEL = "authentication.IDToken"
+
+
+OAUTH2_PROVIDER = {
+    "AUTHORIZATION_CODE_EXPIRE_SECONDS": 60,  # 1 minute
+    "OAUTH2_VALIDATOR_CLASS": "plane.authentication.views.oauth.CustomOAuth2Validator",
+    "ALLOWED_GRANT_TYPES": [
+        "authorization_code",
+        "client_credentials",
+        "refresh_token",
+    ],
+    "PKCE_REQUIRED": is_pkce_required,
+}
+
+
+# OpenSearch settings
+OPENSEARCH_ENABLED = os.environ.get("OPENSEARCH_ENABLED", "0") == "1"
+
+if OPENSEARCH_ENABLED:
+    # OpenSearch Index Settings
+    OPENSEARCH_INDEX_PREFIX = os.environ.get("OPENSEARCH_INDEX_PREFIX", "")
+    OPENSEARCH_SHARD_COUNT = os.environ.get("OPENSEARCH_SHARD_COUNT", 1)
+    OPENSEARCH_REPLICA_COUNT = os.environ.get("OPENSEARCH_REPLICA_COUNT", 0)
+
+    # Text Search Performance Optimization
+    OPENSEARCH_SEARCH_TIMEOUT = int(os.environ.get("OPENSEARCH_SEARCH_TIMEOUT", "60"))  # seconds
+    OPENSEARCH_MAX_PAGE_SIZE = int(os.environ.get("OPENSEARCH_MAX_PAGE_SIZE", "100"))
+    OPENSEARCH_DEFAULT_PAGE_SIZE = int(os.environ.get("OPENSEARCH_DEFAULT_PAGE_SIZE", "25"))
+
+    # Optimizations for 2-active-data-node setup with heavy indexing
+    OPENSEARCH_BULK_CHUNK_SIZE = int(os.environ.get("OPENSEARCH_BULK_CHUNK_SIZE", "500"))  # Smaller chunks
+    OPENSEARCH_INDEXING_TIMEOUT = int(os.environ.get("OPENSEARCH_INDEXING_TIMEOUT", "120"))  # Longer indexing timeout
+
+    OPENSEARCH_ISSUE_INDEX_DEFAULT_PIPELINE = os.environ.get("OPENSEARCH_ISSUE_INDEX_DEFAULT_PIPELINE", None)
+    OPENSEARCH_PAGE_INDEX_DEFAULT_PIPELINE = os.environ.get("OPENSEARCH_PAGE_INDEX_DEFAULT_PIPELINE", None)
+
+    # Batch processing and memory optimization
+    OPENSEARCH_UPDATE_CHUNK_SIZE = int(
+        os.environ.get("OPENSEARCH_UPDATE_CHUNK_SIZE", "1000")
+    )  # Chunk size for processing queued updates
+
+    # OpenSearch Config
+    OPENSEARCH_DSL = {
+        "default": {
+            "hosts": os.environ.get("OPENSEARCH_URL"),
+            "http_auth": (
+                os.environ.get("OPENSEARCH_USERNAME"),
+                os.environ.get("OPENSEARCH_PASSWORD"),
+            ),
+            "use_ssl": True,
+            "verify_certs": False,
+            "ssl_show_warn": False,
+            "timeout": OPENSEARCH_SEARCH_TIMEOUT,
+            # Connection pool optimization for 2-data-node setup
+            "maxsize": 15,  # Reduced from 25 to not overwhelm 2 data nodes
+            "max_retries": 3,
+            "retry_on_timeout": True,
+            # Bulk indexing optimizations
+            "http_compress": True,  # Reduce network overhead
+        }
+    }
+    # Use batched signal processor (only supported mode)
+    OPENSEARCH_DSL_SIGNAL_PROCESSOR = os.environ.get(
+        "OPENSEARCH_DSL_SIGNAL_PROCESSOR",
+        "plane.ee.documents.core.signals.BatchedCelerySignalProcessor",
+    )
+
+    INSTALLED_APPS += ["django_opensearch_dsl"]
+
 
 
 # CORS Settings

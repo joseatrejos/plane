@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2023-present Plane Software, Inc. and contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  * See the LICENSE file for details.
@@ -216,7 +216,23 @@ export default {
   modules: "Modules",
   pages: "Pages",
   intake: "Intake",
-  time_tracking: "Time Tracking",
+  worklog: {
+    label: "Worklog",
+    log_work: "Log work",
+    tracked_time: "Tracked time",
+    time_tracking: {
+      label: "Time Tracking",
+      description: "Log time spent on work items and projects.",
+    },
+    success: {
+      saved: "Worklog created successfully.",
+      updated: "Worklog updated successfully.",
+      deleted: "Worklog deleted successfully.",
+    },
+    validation: {
+      add_duration: "Please add duration",
+    },
+  },
   work_management: "Work management",
   projects_and_issues: "Projects and work items",
   projects_and_issues_description: "Toggle these on or off this project.",
@@ -226,7 +242,6 @@ export default {
   views_description: "Save custom sorts, filters, and display options or share them with your team.",
   pages_description: "Create and edit free-form content; notes, docs, anything.",
   intake_description: "Let non-members share bugs, feedback, and suggestions; without disrupting your workflow.",
-  time_tracking_description: "Log time spent on work items and projects.",
   work_management_description: "Manage your work and projects with ease.",
   documentation: "Documentation",
   message_support: "Message support",

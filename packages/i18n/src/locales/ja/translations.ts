@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2023-present Plane Software, Inc. and contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  * See the LICENSE file for details.
@@ -380,7 +380,23 @@ export default {
   modules: "Modules",
   pages: "Pages",
   intake: "Intake",
-  time_tracking: "時間トラッキング",
+  worklog: {
+    label: "????",
+    log_work: "?????",
+    tracked_time: "??????",
+    time_tracking: {
+      label: "????????",
+      description: "?????????????????????????",
+    },
+    success: {
+      saved: "????????????",
+      updated: "????????????",
+      deleted: "????????????",
+    },
+    validation: {
+      add_duration: "???????????",
+    },
+  },
   work_management: "作業管理",
   projects_and_issues: "プロジェクトと作業項目",
   projects_and_issues_description: "このプロジェクトでオン/オフを切り替えます。",
@@ -391,7 +407,6 @@ export default {
   pages_description: "自由形式のコンテンツを作成・編集できます。メモ、ドキュメント、何でもOKです。",
   intake_description:
     "非メンバーがバグ、フィードバック、提案を共有できるようにし、ワークフローを妨げないようにします。",
-  time_tracking_description: "作業項目やプロジェクトに費やした時間を記録します。",
   work_management_description: "作業とプロジェクトを簡単に管理します。",
   documentation: "ドキュメント",
   message_support: "サポートにメッセージ",

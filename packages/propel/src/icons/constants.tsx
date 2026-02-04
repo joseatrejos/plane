@@ -55,6 +55,7 @@ export const ProjectIconsMap = [
   { icon: <Icon name="project.page" />, title: "PageIcon" },
   { icon: <Icon name="project.view" />, title: "ViewIcon" },
   { icon: <Icon name="project.work-items" />, title: "WorkItemsIcon" },
+  { icon: <Icon name="project.clock" />, title: "ClockIcon" },
 ];
 
 export const SubBrandIconsMap = [

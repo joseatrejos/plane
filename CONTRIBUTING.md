@@ -48,7 +48,11 @@ This helps us triage and manage issues more efficiently.
 
 The project is a monorepo, with backend api and frontend in a single repo.
 
-The backend is a django project which is kept inside apps/api
+The backend is a django project which is kept inside apps/api.
+
+> ⚠️ **Windows Users:** strictly use **WSL (Windows Subsystem for Linux)**.
+
+> **Crucial:** You must clone the repository inside the WSL filesystem (e.g., `~/projects/plane`), **NOT** in the mounted Windows drives (e.g., `/mnt/c/Users/...`). Running this project from a mounted Windows drive will be extremely slow due to file I/O operations and will likely time out.
 
 1. Clone the repo
 
@@ -65,8 +69,13 @@ chmod +x setup.sh
 ```
 
 3. Start the containers
+   > **Note:** Use `--build` flag the first time or when new migrations or requirements are added to dockerfile.dev. For subsequent runs without changes, you can omit the `--build` flag.
 
 ```bash
+# First time or after adding migrations/requirements
+docker compose -f docker-compose-local.yml up --build
+
+# Subsequent runs (if no changes to dockerfile.dev)
 docker compose -f docker-compose-local.yml up
 ```
 
@@ -76,10 +85,44 @@ docker compose -f docker-compose-local.yml up
 pnpm dev
 ```
 
-5. Open your browser to http://localhost:3001/god-mode/ and register yourself as instance admin
-6. Open up your browser to http://localhost:3000 then log in using the same credentials from the previous step
+5. Open your browser to http://localhost:3001/god-mode/ and register yourself as instance admin.
+6. Open up your browser to http://localhost:3000 then log in using the same credentials from the previous step.
 
 That’s it! You’re all set to begin coding. Remember to refresh your browser if changes don’t auto-reload. Happy contributing! 🎉
+
+### Troubleshooting common development issues
+
+#### Hot reload not working after editing compiled assets
+
+When editing compiled assets like icons, translations, or other non-React code, the development server may crash and fail to restart. If this happens, follow these steps:
+
+1. Clean the project:
+
+```bash
+pnpm clean
+```
+
+2. Reinstall dependencies:
+
+```bash
+pnpm i
+```
+
+3. Restart the development server:
+
+```bash
+pnpm dev
+```
+
+> **Note:** In rare cases, the server may fail to start again after these steps. If this happens, simply repeat the process above. The issue typically resolves itself on the second attempt.
+
+#### General development tips
+
+- **Branch selection**: When starting work, try to branch from the latest stable release rather than `preview`, as preview branches may contain unstable features or bugs.
+- **Development environment**: Running this project locally can be challenging and requires patience. Having a stable setup is crucial for a smooth development experience.
+- **Persistence is key**: Local development with Plane requires some trial and error. Don't get discouraged if you encounter issues—they're often resolved with the troubleshooting steps above.
+
+Good luck, and happy coding! 🚀
 
 ## Missing a Feature?
 

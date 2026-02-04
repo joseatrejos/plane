@@ -544,6 +544,36 @@ class IssueLabel(ProjectBaseModel):
         return f"{self.issue.name} {self.label.name}"
 
 
+class IssueUserProperty(ProjectBaseModel):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="issue_property_user",
+    )
+    filters = models.JSONField(default=get_default_filters)
+    display_filters = models.JSONField(default=get_default_display_filters)
+    display_properties = models.JSONField(default=get_default_display_properties)
+    rich_filters = models.JSONField(default=dict)
+
+    class Meta:
+        verbose_name = "Issue User Property"
+        verbose_name_plural = "Issue User Properties"
+        db_table = "issue_user_properties"
+        ordering = ("-created_at",)
+        unique_together = ["user", "project", "deleted_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "project"],
+                condition=Q(deleted_at__isnull=True),
+                name="issue_user_property_unique_user_project_when_deleted_at_null",
+            )
+        ]
+
+    def __str__(self):
+        """Return properties status of the issue"""
+        return str(self.user)
+
+
 class IssueSequence(ProjectBaseModel):
     issue = models.ForeignKey(
         Issue,

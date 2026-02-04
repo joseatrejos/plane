@@ -1,0 +1,309 @@
+# Django imports
+from django.db.models import Q
+
+# Third party imports
+from django_filters import filters
+
+# Module imports
+from plane.utils.filters.filterset import IssueFilterSet, UUIDInFilter, CharInFilter, BaseFilterSet
+from plane.utils.exception_logger import log_exception
+from plane.ee.models import Initiative
+from plane.utils.uuid import is_valid_uuid
+
+
+class ExtendedIssueFilterSet(IssueFilterSet):
+    team_project_id = filters.UUIDFilter(field_name="project_id")
+    team_project_id__in = UUIDInFilter(field_name="project_id", lookup_expr="in")
+
+    type_id = filters.UUIDFilter(field_name="type_id")
+    type_id__in = UUIDInFilter(field_name="type_id", lookup_expr="in")
+
+    milestone_id = filters.UUIDFilter(method="filter_milestone_id")
+    milestone_id__in = UUIDInFilter(method="filter_milestone_id_in", lookup_expr="in")
+
+    customproperty_value = filters.CharFilter(method="filter_custom_property_value")
+    customproperty_value__exact = filters.CharFilter(method="filter_custom_property_value_exact")
+    customproperty_value__in = CharInFilter(method="filter_custom_property_value_in", lookup_expr="in")
+    customproperty_value__gte = filters.CharFilter(method="filter_custom_property_value_gte")
+    customproperty_value__gt = filters.CharFilter(method="filter_custom_property_value_gt")
+    customproperty_value__lte = filters.CharFilter(method="filter_custom_property_value_lte")
+    customproperty_value__lt = filters.CharFilter(method="filter_custom_property_value_lt")
+    customproperty_value__icontains = filters.CharFilter(method="filter_custom_property_value_icontains")
+    customproperty_value__contains = filters.CharFilter(method="filter_custom_property_value_contains")
+    customproperty_value__startswith = filters.CharFilter(method="filter_custom_property_value_startswith")
+    customproperty_value__endswith = filters.CharFilter(method="filter_custom_property_value_endswith")
+    customproperty_value__range = filters.CharFilter(method="filter_custom_property_value_range")
+
+    class Meta(IssueFilterSet.Meta):
+        fields = IssueFilterSet.Meta.fields
+        fields.update(
+            {
+                "name": ["exact", "icontains", "contains", "startswith", "endswith"],
+                "start_date": ["exact", "gte", "gt", "lte", "lt", "range"],
+                "target_date": ["exact", "gte", "gt", "lte", "lt", "range"],
+                "created_at": ["exact", "gte", "gt", "lte", "lt", "range"],
+                "updated_at": ["exact", "gte", "gt", "lte", "lt", "range"],
+            }
+        )
+
+    def _extract_field_names(self, filter_data):
+        """Extract all field names from a nested filter structure"""
+        if isinstance(filter_data, dict):
+            fields = []
+            for key, value in filter_data.items():
+                if key.lower() in ("or", "and", "not"):
+                    # This is a logical operator, process its children
+                    if key.lower() == "not":
+                        # 'not' has a dict as its value, not a list
+                        if isinstance(value, dict):
+                            fields.extend(self._extract_field_names(value))
+                    else:
+                        # 'or' and 'and' have lists as their values
+                        for item in value:
+                            fields.extend(self._extract_field_names(item))
+                else:
+                    # This is a field name
+                    fields.append(key)
+            return fields
+        return []
+
+    def filter_custom_property_value(self, queryset, name, value):
+        """Filter by custom property value (exact match)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "exact", value)
+
+    def filter_custom_property_value_exact(self, queryset, name, value):
+        """Filter by custom property value (exact match)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "exact", value)
+
+    def filter_custom_property_value_in(self, queryset, name, value):
+        """Filter by custom property value (in list)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "in", value)
+
+    def filter_custom_property_value_gte(self, queryset, name, value):
+        """Filter by custom property value (greater than or equal)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "gte", value)
+
+    def filter_custom_property_value_gt(self, queryset, name, value):
+        """Filter by custom property value (greater than)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "gt", value)
+
+    def filter_custom_property_value_lte(self, queryset, name, value):
+        """Filter by custom property value (less than or equal)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "lte", value)
+
+    def filter_custom_property_value_lt(self, queryset, name, value):
+        """Filter by custom property value (less than)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "lt", value)
+
+    def filter_custom_property_value_icontains(self, queryset, name, value):
+        """Filter by custom property value (case-insensitive contains)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "icontains", value)
+
+    def filter_custom_property_value_contains(self, queryset, name, value):
+        """Filter by custom property value (contains)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "contains", value)
+
+    def filter_custom_property_value_startswith(self, queryset, name, value):
+        """Filter by custom property value (starts with)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "startswith", value)
+
+    def filter_custom_property_value_endswith(self, queryset, name, value):
+        """Filter by custom property value (ends with)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "endswith", value)
+
+    def filter_custom_property_value_range(self, queryset, name, value):
+        """Filter by custom property value (range)"""
+        return self._filter_custom_property_value_with_lookup(queryset, "range", value)
+
+    def _filter_custom_property_value_with_lookup(self, queryset, lookup, value):
+        """Helper method to filter by custom property value with a specific lookup.
+
+        This method handles the actual filtering logic for custom properties by:
+        1. Getting the property_id from the request context (set by the filter backend)
+        2. Using a subquery to avoid JOIN conflicts when multiple custom properties are filtered
+        3. Applying the appropriate lookup based on the property type
+        """
+
+        # Get the property_id from the request context
+        # This is set by the filter backend
+        # Build the filter based on the property type and lookup
+        from plane.ee.models.issue_properties import IssueProperty, IssuePropertyValue, PropertyTypeEnum
+
+        try:
+            # Split the value into property_id and value
+            # Format: custompropertyvalue__<lookup>=<property_id>;<value>
+            if isinstance(value, list):
+                # If the value is a list, check if it is empty
+                if not value:
+                    return Q()
+                # If the value is a list, split the first element into property_id and value
+                property_id, _ = value[0].split(";")
+                # For each value in the list, split it into property_id and value
+                values = []
+                for val in value:
+                    _, v = val.split(";")
+                    values.append(v)
+                value = values
+            else:
+                property_id, value = value.split(";")
+
+            # If the property_id or value is not valid, return an empty Q object
+            if not property_id or not value:
+                return Q()
+
+            if not is_valid_uuid(property_id):
+                return Q()
+
+            # Get the property to determine its type
+            property_obj = IssueProperty.objects.get(id=property_id)
+
+            # Build the filter based on the property type and lookup
+            if property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+            ]:
+                field_name = "value_text"
+            elif property_obj.property_type == PropertyTypeEnum.DECIMAL:
+                field_name = "value_decimal"
+            elif property_obj.property_type == PropertyTypeEnum.BOOLEAN:
+                field_name = "value_boolean"
+            elif property_obj.property_type == PropertyTypeEnum.DATETIME:
+                field_name = "value_datetime"
+            elif property_obj.property_type == PropertyTypeEnum.RELATION:
+                field_name = "value_uuid"
+            elif property_obj.property_type == PropertyTypeEnum.OPTION:
+                field_name = "value_option"
+            else:
+                return Q()
+
+            # Build base filters for the subquery
+            base_filters = {
+                "issue__type_id": property_obj.issue_type_id,
+                "property_id": property_id,
+                "property__deleted_at__isnull": True,
+                "deleted_at__isnull": True,
+            }
+
+            # Add the lookup-specific filter
+            if lookup == "exact" and property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+                PropertyTypeEnum.BOOLEAN.value,
+                PropertyTypeEnum.OPTION.value,
+                PropertyTypeEnum.RELATION.value,
+                PropertyTypeEnum.DATETIME.value,
+                PropertyTypeEnum.DECIMAL.value,
+            ]:
+                base_filters[field_name] = value
+            elif lookup == "in" and property_obj.property_type in [
+                PropertyTypeEnum.OPTION.value,
+                PropertyTypeEnum.RELATION.value,
+            ]:
+                base_filters[f"{field_name}__in"] = value
+            elif lookup == "gte" and property_obj.property_type in [
+                PropertyTypeEnum.DECIMAL.value,
+                PropertyTypeEnum.DATETIME.value,
+            ]:
+                base_filters[f"{field_name}__gte"] = value
+            elif lookup == "gt" and property_obj.property_type in [
+                PropertyTypeEnum.DECIMAL.value,
+                PropertyTypeEnum.DATETIME.value,
+            ]:
+                base_filters[f"{field_name}__gt"] = value
+            elif lookup == "lte" and property_obj.property_type in [
+                PropertyTypeEnum.DECIMAL.value,
+                PropertyTypeEnum.DATETIME.value,
+            ]:
+                base_filters[f"{field_name}__lte"] = value
+            elif lookup == "lt" and property_obj.property_type in [
+                PropertyTypeEnum.DECIMAL.value,
+                PropertyTypeEnum.DATETIME.value,
+            ]:
+                base_filters[f"{field_name}__lt"] = value
+            elif lookup == "icontains" and property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+            ]:
+                base_filters[f"{field_name}__icontains"] = value
+            elif lookup == "contains" and property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+            ]:
+                base_filters[f"{field_name}__contains"] = value
+            elif lookup == "startswith" and property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+            ]:
+                base_filters[f"{field_name}__startswith"] = value
+            elif lookup == "endswith" and property_obj.property_type in [
+                PropertyTypeEnum.TEXT.value,
+                PropertyTypeEnum.URL.value,
+            ]:
+                base_filters[f"{field_name}__endswith"] = value
+            elif lookup == "range" and property_obj.property_type in [
+                PropertyTypeEnum.DECIMAL.value,
+                PropertyTypeEnum.DATETIME.value,
+            ]:
+                value = value.split(",")
+                if isinstance(value, list) and len(value) == 2:
+                    base_filters[f"{field_name}__range"] = value
+                else:
+                    return Q()
+            else:
+                return Q()
+
+            # Use a subquery to find matching issue IDs
+            # This ensures each custom property filter is independent
+            matching_issues = IssuePropertyValue.objects.filter(
+                **base_filters
+            ).values_list("issue_id", flat=True)
+
+            # Return Q object with pk__in subquery
+            return Q(pk__in=matching_issues)
+
+        except Exception as e:
+            log_exception(e)
+            return Q()
+    
+    def filter_milestone_id(self, queryset, name, value):
+        """Filter by milestone ID, excluding soft deleted milestones"""
+        return Q(
+            issue_milestone__milestone_id=value,
+            issue_milestone__deleted_at__isnull=True,
+        )
+
+    def filter_milestone_id_in(self, queryset, name, value):
+        """Filter by milestone IDs (in), excluding soft deleted milestones"""
+        return Q(
+            issue_milestone__milestone_id__in=value,
+            issue_milestone__deleted_at__isnull=True,
+        )
+
+
+class InitiativeFilterSet(BaseFilterSet):
+    lead = filters.UUIDFilter(field_name="lead")
+    lead__in = UUIDInFilter(field_name="lead", lookup_expr="in")
+    label_id = filters.UUIDFilter(method="filter_label_id")
+    label_id__in = UUIDInFilter(method="filter_label_id_in", lookup_expr="in")
+
+    class Meta:
+        model = Initiative
+        fields = {
+            "start_date": ["exact", "gte", "gt", "lte", "lt", "range"],
+            "end_date": ["exact", "gte", "gt", "lte", "lt", "range"],
+            "state": ["exact", "in"],
+        }
+
+    def filter_label_id(self, queryset, name, value):
+        """Filter by label IDs (in), excluding soft deleted labels"""
+        return Q(
+            initiative_label_associations__label_id=value,
+            initiative_label_associations__deleted_at__isnull=True,
+        )
+
+    def filter_label_id_in(self, queryset, name, value):
+        """Filter by label IDs (in), excluding soft deleted labels"""
+        return Q(
+            initiative_label_associations__label_id__in=value,
+            initiative_label_associations__deleted_at__isnull=True,
+        )

@@ -4,7 +4,7 @@
 
 # Python imports
 import pytz
-from uuid import uuid4
+from uuid import UUID, uuid4
 from enum import Enum
 
 # Django imports
@@ -14,7 +14,7 @@ from django.db import models
 from django.db.models import Q
 
 # Module imports
-from plane.db.mixins import AuditModel
+from plane.db.mixins import AuditModel, AuditModel, SoftDeletionManager, SoftDeletionQuerySet
 
 from .base import BaseModel
 
@@ -174,10 +174,53 @@ class Project(BaseModel):
 
         return super().save(*args, **kwargs)
 
+class ProjectQuerySet(SoftDeletionQuerySet):
+    """QuerySet for project related models that handles accessibility"""
+
+    def accessible_to(self, user_id: UUID, slug: str):
+        from plane.ee.models import TeamspaceMember, TeamspaceProject
+        from plane.payment.flags.flag import FeatureFlag
+        from plane.payment.flags.flag_decorator import check_workspace_feature_flag
+
+        # Get all the projects where the user is a member
+        member_project_ids = ProjectMember.objects.filter(
+            member_id=user_id, workspace__slug=slug, is_active=True
+        ).values_list("project_id", flat=True)
+
+        base_query = Q(project_id__in=member_project_ids)
+
+        if check_workspace_feature_flag(feature_key=FeatureFlag.TEAMSPACES, user_id=user_id, slug=slug):
+            ## Get all team ids where the user is a member
+            teamspace_ids = TeamspaceMember.objects.filter(member_id=user_id, workspace__slug=slug).values_list(
+                "team_space_id", flat=True
+            )
+
+            # Get all the projects in the respective teamspaces
+            teamspace_project_ids = (
+                TeamspaceProject.objects.filter(team_space_id__in=teamspace_ids)
+                .exclude(project_id__in=member_project_ids)
+                .values_list("project_id", flat=True)
+            )
+
+            return self.filter(
+                Q(project_id__in=teamspace_project_ids) | base_query,
+            )
+
+        return self.filter(base_query)
+
+class ProjectManager(SoftDeletionManager):
+    """Manager for project related models that handles accessibility"""
+
+    def get_queryset(self):
+        return ProjectQuerySet(self.model, using=self._db).filter(deleted_at__isnull=True)
+
+    def accessible_to(self, user_id: UUID, slug: str):
+        return self.get_queryset().accessible_to(user_id, slug)
 
 class ProjectBaseModel(BaseModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="project_%(class)s")
     workspace = models.ForeignKey("db.Workspace", on_delete=models.CASCADE, related_name="workspace_%(class)s")
+    objects = ProjectManager()
 
     class Meta:
         abstract = True

@@ -1,6 +1,7 @@
 # Copyright (c) 2023-present Plane Software, Inc. and contributors
 # SPDX-License-Identifier: AGPL-3.0-only
 # See the LICENSE file for details.
+from enum import Enum
 
 # Django imports
 from django.conf import settings
@@ -9,6 +10,12 @@ from django.db import models
 # Module imports
 from .base import BaseModel
 
+class EntityName(Enum):
+    EPIC = "epic"
+    ISSUE = "issue"
+    INITIATIVE = "initiative"
+    TEAMSPACE = "teamspace"
+    EPIC_UPDATE = "epic-update"
 
 class Notification(BaseModel):
     workspace = models.ForeignKey("db.Workspace", related_name="notifications", on_delete=models.CASCADE)

@@ -1,9 +1,3 @@
-/**
- * Copyright (c) 2023-present Plane Software, Inc. and contributors
- * SPDX-License-Identifier: AGPL-3.0-only
- * See the LICENSE file for details.
- */
-
 import { concat, orderBy, set, uniq, update } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
@@ -34,6 +28,18 @@ export interface IIssueActivityStoreActions {
     issueId: string,
     loaderType?: TActivityLoader
   ) => Promise<TIssueActivity[]>;
+  fetchWorklogs: (workspaceSlug: string, projectId: string, issueId: string) => Promise<TIssueWorklog[] | undefined>;
+  addWorklog: (issueId: string, worklog: TIssueWorklog) => void;
+  removeWorklog: (issueId: string, worklogId: string) => void;
+}
+
+export interface TIssueWorklog {
+  id: string;
+  created_at: string;
+  duration: number;
+  description: string;
+  created_by?: string;
+  logged_by?: string;
 }
 
 export interface IIssueActivityStore extends IIssueActivityStoreActions {
@@ -41,9 +47,12 @@ export interface IIssueActivityStore extends IIssueActivityStoreActions {
   loader: TActivityLoader;
   activities: TIssueActivityIdMap;
   activityMap: TIssueActivityMap;
+  worklogs: TIssueActivityIdMap;
+  worklogMap: Record<string, TIssueWorklog>;
   // helper methods
   getActivitiesByIssueId: (issueId: string) => string[] | undefined;
   getActivityById: (activityId: string) => TIssueActivity | undefined;
+  getWorklogById: (worklogId: string) => TIssueWorklog | undefined;
   getActivityAndCommentsByIssueId: (issueId: string, sortOrder: E_SORT_ORDER) => TIssueActivityComment[] | undefined;
 }
 
@@ -52,6 +61,9 @@ export class IssueActivityStore implements IIssueActivityStore {
   loader: TActivityLoader = "fetch";
   activities: TIssueActivityIdMap = {};
   activityMap: TIssueActivityMap = {};
+
+  worklogs: TIssueActivityIdMap = {};
+  worklogMap: Record<string, TIssueWorklog> = {};
   // services
   serviceType;
   issueActivityService;
@@ -65,8 +77,12 @@ export class IssueActivityStore implements IIssueActivityStore {
       loader: observable.ref,
       activities: observable,
       activityMap: observable,
+      worklogs: observable,
+      worklogMap: observable,
       // actions
       fetchActivities: action,
+      addWorklog: action,
+      removeWorklog: action,
     });
     this.serviceType = serviceType;
     // services
@@ -84,6 +100,35 @@ export class IssueActivityStore implements IIssueActivityStore {
     return this.activityMap[activityId] ?? undefined;
   };
 
+  getWorklogById = (worklogId: string) => {
+    if (!worklogId) return undefined;
+    return this.worklogMap[worklogId] ?? undefined;
+  };
+
+  addWorklog = (issueId: string, worklog: TIssueWorklog) => {
+    if (!issueId || !worklog?.id) return;
+    const currentIds = this.worklogs[issueId] ?? [];
+    set(this.worklogs, issueId, uniq(concat(currentIds, [worklog.id])));
+    set(this.worklogMap, worklog.id, worklog);
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("worklog_updated"));
+    }
+  };
+
+  removeWorklog = (issueId: string, worklogId: string) => {
+    if (!issueId || !worklogId) return;
+    const currentIds = this.worklogs[issueId] ?? [];
+    set(
+      this.worklogs,
+      issueId,
+      currentIds.filter((id) => id !== worklogId)
+    );
+    if (this.worklogMap[worklogId]) delete this.worklogMap[worklogId];
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("worklog_updated"));
+    }
+  };
+
   protected buildActivityAndCommentItems(issueId: string): TIssueActivityComment[] | undefined {
     if (!issueId) return undefined;
 
@@ -94,6 +139,8 @@ export class IssueActivityStore implements IIssueActivityStore {
 
     const activities = this.getActivitiesByIssueId(issueId);
     const comments = currentStore.comment.getCommentsByIssueId(issueId);
+
+    const worklogIds = this.worklogs[issueId] || [];
 
     if (!activities || !comments) return undefined;
 
@@ -122,6 +169,20 @@ export class IssueActivityStore implements IIssueActivityStore {
         id: comment.id,
         activity_type: EActivityFilterType.COMMENT,
         created_at: comment.created_at,
+      });
+    });
+
+    worklogIds.forEach((worklogId) => {
+      const worklog = this.worklogMap[worklogId];
+      if (!worklog) return;
+      activityComments.push({
+        id: worklog.id,
+        activity_type: EActivityFilterType.WORKLOG, // Este es el tipo que activamos en el filtro
+        created_at: worklog.created_at,
+        duration: worklog.duration, // Pasamos la duración
+        description: worklog.description, // Pasamos la descripción
+        created_by: worklog.created_by,
+        logged_by: worklog.logged_by,
       });
     });
 
@@ -155,9 +216,16 @@ export class IssueActivityStore implements IIssueActivityStore {
         if (currentActivity) props = { created_at__gt: currentActivity.created_at };
       }
 
-      const activities = await this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props);
+      // Explicitly type the results of the Promise.all
+      const [activities, worklogs] = await Promise.all([
+        this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props) as Promise<
+          TIssueActivity[]
+        >,
+        this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId) as Promise<TIssueWorklog[]>,
+      ]);
 
       const activityIds = activities.map((activity) => activity.id);
+      const worklogIds = worklogs.map((w) => w.id);
 
       runInAction(() => {
         update(this.activities, issueId, (currentActivityIds) => {
@@ -167,13 +235,51 @@ export class IssueActivityStore implements IIssueActivityStore {
         activities.forEach((activity) => {
           set(this.activityMap, activity.id, activity);
         });
+
+        set(this.worklogs, issueId, worklogIds);
+        worklogs.forEach((w) => {
+          set(this.worklogMap, w.id, w);
+        });
+
         this.loader = undefined;
       });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("worklog_updated"));
+      }
 
       return activities;
     } catch (error) {
       this.loader = undefined;
       throw error;
+    }
+  }
+
+  public async fetchWorklogs(
+    workspaceSlug: string,
+    projectId: string,
+    issueId: string
+  ): Promise<TIssueWorklog[] | undefined> {
+    try {
+      const worklogs = (await this.issueActivityService.getIssueWorklogs(
+        workspaceSlug,
+        projectId,
+        issueId
+      )) as TIssueWorklog[];
+
+      runInAction(() => {
+        const ids = worklogs.map((w) => w.id);
+        set(this.worklogs, issueId, ids);
+        worklogs.forEach((w) => {
+          set(this.worklogMap, w.id, w);
+        });
+      });
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("worklog_updated"));
+      }
+      return worklogs;
+    } catch (error) {
+      console.error("Error al cargar worklogs en el store", error);
+      return undefined;
     }
   }
 }

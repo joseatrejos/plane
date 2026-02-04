@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2023-present Plane Software, Inc. and contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  * See the LICENSE file for details.
@@ -386,7 +386,23 @@ export default {
   modules: "Modules",
   pages: "Pages",
   intake: "Intake",
-  time_tracking: "Suivi du temps",
+  worklog: {
+    label: "Journal de travail",
+    log_work: "Consigner le travail",
+    tracked_time: "Temps suivi",
+    time_tracking: {
+      label: "Suivi du temps",
+      description: "Enregistrez le temps pass? sur les ?l?ments de travail et les projets.",
+    },
+    success: {
+      saved: "Journal de travail cr?? avec succ?s.",
+      updated: "Journal de travail mis ? jour avec succ?s.",
+      deleted: "Journal de travail supprim? avec succ?s.",
+    },
+    validation: {
+      add_duration: "Veuillez ajouter une dur?e",
+    },
+  },
   work_management: "Organisation du travail",
   projects_and_issues: "Projets et éléments de travail",
   projects_and_issues_description: "Activez ou désactivez ces éléments pour ce projet.",
@@ -398,7 +414,6 @@ export default {
   pages_description: "Créez et modifiez du contenu libre : notes, documents, tout ce que vous voulez.",
   intake_description:
     "Permettez aux non-membres de partager des bugs, des retours et des suggestions, sans perturber votre flux de travail.",
-  time_tracking_description: "Enregistrez le temps passé sur les éléments de travail et les projets.",
   work_management_description: "Gérez votre travail et vos projets facilement.",
   documentation: "Documentation",
   message_support: "Contacter le support",

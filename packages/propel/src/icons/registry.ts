@@ -39,10 +39,22 @@ import {
   SheetLayoutIcon,
   TimelineLayoutIcon,
 } from "./layouts";
+
 // Misc icons
 import { InfoIcon } from "./misc";
+
 // Project icons
-import { CycleIcon, EpicIcon, IntakeIcon, ModuleIcon, PageIcon, ViewsIcon, WorkItemsIcon } from "./project";
+import {
+  ClockIcon, // Único de HEAD
+  CycleIcon,
+  EpicIcon,
+  IntakeIcon,
+  ModuleIcon,
+  PageIcon,
+  ViewsIcon,
+  WorkItemsIcon,
+} from "./project";
+
 // Property icons
 import {
   BooleanPropertyIcon,
@@ -65,11 +77,13 @@ import {
   UserPropertyIcon,
   UserSquarePropertyIcon,
   WorkflowsPropertyIcon,
+  LabelFilledIcon, // Único de preview
 } from "./properties";
-// Sub-brand icons
-import { CopyLinkIcon } from "./actions/copy-link";
-import { LabelFilledIcon } from "./properties/label-filled-icon";
+
+// Sub-brand icons & Actions
+import { CopyLinkIcon } from "./actions/copy-link"; // Único de preview
 import { PiChatLogo, PlaneNewIcon, WikiIcon } from "./sub-brand";
+
 // Workspace icons
 import {
   AnalyticsIcon,
@@ -111,6 +125,7 @@ export const ICON_REGISTRY = {
   "project.page": PageIcon,
   "project.view": ViewsIcon,
   "project.work-items": WorkItemsIcon,
+  "project.clock": ClockIcon,
 
   // Layout icons
   "layout.calendar": CalendarLayoutIcon,

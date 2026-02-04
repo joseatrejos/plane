@@ -33,7 +33,7 @@ def populate_product_tour(apps, _schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db', '0112_auto_20251124_0603'),
+        ('db', '0001_initial'),
     ]
 
     operations = [

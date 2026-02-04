@@ -40,4 +40,12 @@ export class IssueActivityService extends APIService {
         throw error?.response?.data;
       });
   }
+
+  async getIssueWorklogs(workspaceSlug: string, projectId: string, issueId: string): Promise<any[]> {
+    return this.get(`/api/workspaces/${workspaceSlug}/projects/${projectId}/issues/${issueId}/worklogs/`)
+      .then((response) => response?.data)
+      .catch((error) => {
+        throw error?.response?.data;
+      });
+  }
 }

@@ -165,6 +165,8 @@ from .decorators import (
     module_docs,
     module_issue_docs,
     state_docs,
+    issue_worklog_docs,
+
 )
 
 # Schema processing hooks

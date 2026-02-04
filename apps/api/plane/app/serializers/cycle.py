@@ -10,6 +10,7 @@ from .base import BaseSerializer
 from .issue import IssueStateSerializer
 from plane.db.models import Cycle, CycleIssue, CycleUserProperties
 from plane.utils.timezone_converter import convert_to_utc
+from plane.ee.models import EntityProgress
 
 
 class CycleWriteSerializer(BaseSerializer):
@@ -104,3 +105,9 @@ class CycleUserPropertiesSerializer(BaseSerializer):
         model = CycleUserProperties
         fields = "__all__"
         read_only_fields = ["workspace", "project", "cycle", "user"]
+
+
+class EntityProgressSerializer(BaseSerializer):
+    class Meta:
+        model = EntityProgress
+        fields = "__all__"
