@@ -58,13 +58,15 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
 
   return (
     <div className={`flex w-full items-center ${gapClassName} min-h-8`}>
-      <div className={`flex items-center gap-1 flex-shrink-0 text-sm text-custom-text-300 ${labelClassName}`}>
-        <Icon name="project.clock" className="h-4 w-4 flex-shrink-0" />
+      <div
+        className={`flex shrink-0 items-center gap-1.5 w-30 text-body-xs-regular text-tertiary h-7.5 ${labelClassName}`}
+      >
+        <Icon name="project.clock" className="size-4 shrink-0" />
         <span>{t("worklog.tracked_time") || "Total worklog"}</span>
       </div>
 
       <div className="flex flex-grow flex-col gap-3 truncate">
-        <div className="px-2 text-sm text-custom-text-200">
+        <div className="px-2 text-sm text-placeholder">
           {hours}h {minutes}m
         </div>
       </div>
