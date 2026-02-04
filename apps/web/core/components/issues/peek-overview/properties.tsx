@@ -266,7 +266,6 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           workspaceSlug={workspaceSlug}
           projectId={projectId}
           issueId={issueId}
-          // Default is already w-1/4, so you don't strictly need to pass it, but to be safe:
           labelClassName="w-1/4"
           gapClassName="gap-3"
         />

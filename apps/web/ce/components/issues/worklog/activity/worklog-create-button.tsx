@@ -5,12 +5,11 @@ import axios, { AxiosError } from "axios";
 import { Button } from "@plane/propel/button";
 import { Popover } from "@plane/ui";
 import { useTranslation } from "@plane/i18n";
-import { Icon } from "@plane/propel/icons";
 import { API_BASE_URL } from "@plane/constants";
 import { setToast, TOAST_TYPE } from "@plane/propel/toast";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import type { TIssueWorklog } from "@/plane-web/store/issue/issue-details/activity.store";
-import type { FC } from "react";
+import { WorklogForm } from "./worklog-form";
 
 type Props = {
   workspaceSlug?: string;
@@ -99,70 +98,24 @@ export function IssueActivityWorklogCreateButton(props: Props) {
       }
     >
       {({ close }: { close: () => void }) => (
-        <div
-          role="presentation"
-          className="w-80 p-4 bg-custom-background-100 border border-custom-border-200 rounded-md shadow-lg space-y-4 outline-none"
+        <WorklogForm
+          hours={hours}
+          minutes={minutes}
+          description={description}
+          onHoursChange={setHours}
+          onMinutesChange={setMinutes}
+          onDescriptionChange={setDescription}
+          onSave={() => void handleSave(close)}
+          onCancel={() => {
+            setHours("");
+            setMinutes("");
+            setDescription("");
+            close();
+          }}
+          isSaving={isSaving}
+          saveButtonText={t("save") || "Save"}
           onKeyDown={(e) => handleKeyDown(e, close)}
-        >
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2 py-1 bg-custom-background-80 rounded-full border border-custom-border-200">
-              <Icon name="project.clock" className="h-3 w-3 text-custom-text-300" />
-              <span className="text-[11px] font-medium text-custom-text-200">
-                {hours || 0}h {minutes || 0}m
-              </span>
-            </div>
-          </div>
-
-          <div className="flex gap-2">
-            <input
-              type="number"
-              placeholder="Hours"
-              value={hours}
-              onChange={(e) => setHours(e.target.value)}
-              className="w-full bg-custom-background-90 border border-custom-border-200 rounded px-2 py-1 text-sm outline-none focus:border-custom-primary-100 text-custom-text-100"
-            />
-            <input
-              type="number"
-              placeholder="Minutes"
-              value={minutes}
-              onChange={(e) => setMinutes(e.target.value)}
-              className="w-full bg-custom-background-90 border border-custom-border-200 rounded px-2 py-1 text-sm outline-none focus:border-custom-primary-100 text-custom-text-100"
-            />
-          </div>
-
-          <textarea
-            placeholder="Description..."
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-custom-background-90 border border-custom-border-200 rounded p-2 text-sm min-h-[80px] outline-none focus:border-custom-primary-100 text-custom-text-100 resize-none"
-          />
-
-          <div className="flex justify-end gap-2">
-            <button
-              type="button"
-              className="px-3 py-1 text-sm text-custom-text-200 hover:bg-custom-background-80 rounded transition-colors"
-              onClick={() => {
-                setHours("");
-                setMinutes("");
-                setDescription("");
-                close();
-              }}
-              disabled={isSaving}
-            >
-              {t("cancel") || "Cancel"}
-            </button>
-            <button
-              type="button"
-              className="px-4 py-1 text-sm bg-custom-primary-100 text-white rounded hover:bg-custom-primary-200 transition-colors font-medium"
-              onClick={() => {
-                void handleSave(close);
-              }}
-              disabled={isSaving}
-            >
-              {isSaving ? t("save") || "Saving..." : t("save") || "Save"}
-            </button>
-          </div>
-        </div>
+        />
       )}
     </Popover>
   );
