@@ -31,27 +31,8 @@ def count_member_payments(members_list):
 def handle_free_plan_invite_case(slug, requested_invite_list, workspace_license):
     """This function handles the free plan invite case"""
 
-    # Case 1a
-    total_requested_invite_count = len(requested_invite_list)
-
-    # Get the current total invited and current active users in the workspace
-    current_active_users = WorkspaceMember.objects.filter(
-        workspace__slug=slug, is_active=True, member__is_bot=False
-    ).count()
-
-    # Get the current total invited users in the workspace
-    current_invited_users = WorkspaceMemberInvite.objects.filter(
-        workspace__slug=slug
-    ).count()
-
-    # Check if the total
-    if (
-        current_active_users + current_invited_users + total_requested_invite_count
-        <= workspace_license.free_seats
-    ):
-        return True, 0, 0
-    else:
-        return False, 0, 0
+    # Free plan invites are unlimited.
+    return True, 0, 0
 
 
 def handle_free_plan_update_case(slug, requested_role, workspace_license):
