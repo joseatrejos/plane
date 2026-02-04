@@ -179,19 +179,15 @@ def count_total_seats(workspace_license):
 def show_seats_banner(workspace_license):
     """Determine if the seats banner should be shown"""
     if workspace_license.plan == WorkspaceLicense.PlanChoice.FREE:
-        return count_total_seats(workspace_license) >= int(
-            os.environ.get("SEATS_BANNER_LIMIT", 8)
-        )
+        return False
     return False
 
 
 def is_free_member_count_exceeded(workspace_license):
     """Determine if the free member count has been exceeded"""
-    current_seats = count_total_seats(workspace_license)
     if workspace_license.plan == WorkspaceLicense.PlanChoice.FREE:
-        return current_seats > workspace_license.free_seats
-    else:
         return False
+    return False
 
 
 def can_delete_workspace(workspace_license):
