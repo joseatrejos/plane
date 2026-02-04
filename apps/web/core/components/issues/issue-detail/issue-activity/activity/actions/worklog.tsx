@@ -16,6 +16,8 @@ import { WorklogQuickActions } from "./helpers/worklog";
 import type { TIssueWorklog } from "@/plane-web/store/issue/issue-details/activity.store";
 import { Icon } from "@plane/propel/icons";
 import { WorklogForm } from "@/plane-web/components/issues/worklog/activity/worklog-form";
+
+
 // Define proper types for the worklog data
 interface ActorDetail {
   id?: string;
@@ -125,7 +127,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
     activity: { addWorklog, removeWorklog },
   } = useIssueDetail();
   const { getUserDetails } = useMember();
-  const { t } = useTranslation();
+  const { t } = useTranslation() as { t: (key: string) => string };
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editHours, setEditHours] = useState("");
   const [editMinutes, setEditMinutes] = useState("");
@@ -163,7 +165,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
       setToast({
         type: TOAST_TYPE.ERROR,
         title: t("common.error.label"),
-        message: t("please_add_duration") || "Please add a duration",
+        message: t("worklog.validation.add_duration") || "Please add a duration",
       });
       return;
     }
@@ -183,7 +185,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: t("success"),
-        message: t("worklog_success_saved") || "Worklog updated",
+        message: t("worklog.success.updated") || "Worklog updated",
       });
     } catch (err) {
       const error = err as AxiosError<{ detail?: string }>;
@@ -204,7 +206,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: t("success"),
-        message: t("worklog_success_deleted") || "Worklog deleted",
+        message: t("worklog.success.deleted") || "Worklog deleted",
       });
     } catch (err) {
       const error = err as AxiosError<{ detail?: string }>;

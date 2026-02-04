@@ -20,7 +20,7 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
   // Set defaults that match your "Sidebar" (w-1/4)
   const { workspaceSlug, projectId, issueId, labelClassName = "w-1/4", gapClassName = "gap-3" } = props;
 
-  const { t } = useTranslation();
+  const { t } = useTranslation() as { t: (key: string) => string };
   const [totalMinutes, setTotalMinutes] = useState<number | null>(null);
 
   const fetchTotal = useCallback(async () => {
@@ -60,7 +60,7 @@ export const IssueTotalWorklog = (props: TIssueTotalWorklog) => {
     <div className={`flex w-full items-center ${gapClassName} min-h-8`}>
       <div className={`flex items-center gap-1 flex-shrink-0 text-sm text-custom-text-300 ${labelClassName}`}>
         <Icon name="project.clock" className="h-4 w-4 flex-shrink-0" />
-        <span>{t("tracked_time") || "Total worklog"}</span>
+        <span>{t("worklog.tracked_time") || "Total worklog"}</span>
       </div>
 
       <div className="flex flex-grow flex-col gap-3 truncate">

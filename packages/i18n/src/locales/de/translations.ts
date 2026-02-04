@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2023-present Plane Software, Inc. and contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  * See the LICENSE file for details.
@@ -390,7 +390,23 @@ export default {
   modules: "Module",
   pages: "Seiten",
   intake: "Eingang",
-  time_tracking: "Zeiterfassung",
+  worklog: {
+    label: "Arbeitsprotokoll",
+    log_work: "Arbeitszeit erfassen",
+    tracked_time: "Erfasste Zeit",
+    time_tracking: {
+      label: "Zeiterfassung",
+      description: "Erfassen Sie die auf Arbeitselemente und Projekte verwendete Zeit.",
+    },
+    success: {
+      saved: "Arbeitszeit erfolgreich erfasst.",
+      updated: "Arbeitszeit erfolgreich aktualisiert.",
+      deleted: "Arbeitszeit erfolgreich gel?scht.",
+    },
+    validation: {
+      add_duration: "Bitte eine Dauer hinzuf?gen",
+    },
+  },
   work_management: "Arbeitsverwaltung",
   projects_and_issues: "Projekte und Arbeitselemente",
   projects_and_issues_description: "Aktivieren oder deaktivieren Sie diese Funktionen im Projekt.",
@@ -402,7 +418,6 @@ export default {
   pages_description: "Erstellen und bearbeiten Sie frei formulierte Inhalte – Notizen, Dokumente, alles Mögliche.",
   intake_description:
     "Erlauben Sie Nicht-Mitgliedern, Bugs, Feedback und Vorschläge zu teilen – ohne Ihren Arbeitsablauf zu stören.",
-  time_tracking_description: "Erfassen Sie die auf Arbeitselemente und Projekte verwendete Zeit.",
   work_management_description: "Verwalten Sie Ihre Arbeit und Projekte mühelos.",
   documentation: "Dokumentation",
   message_support: "Support kontaktieren",

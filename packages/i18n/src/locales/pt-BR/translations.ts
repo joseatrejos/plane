@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Copyright (c) 2023-present Plane Software, Inc. and contributors
  * SPDX-License-Identifier: AGPL-3.0-only
  * See the LICENSE file for details.
@@ -387,7 +387,23 @@ export default {
   modules: "Módulos",
   pages: "Páginas",
   intake: "Admissão",
-  time_tracking: "Rastreamento de tempo",
+  worklog: {
+    label: "Registro de trabalho",
+    log_work: "Registrar trabalho",
+    tracked_time: "Tempo registrado",
+    time_tracking: {
+      label: "Rastreamento de tempo",
+      description: "Registre o tempo gasto em itens de trabalho e projetos.",
+    },
+    success: {
+      saved: "Registro de trabalho criado com sucesso.",
+      updated: "Registro de trabalho atualizado com sucesso.",
+      deleted: "Registro de trabalho exclu?do com sucesso.",
+    },
+    validation: {
+      add_duration: "Por favor, adicione uma dura??o",
+    },
+  },
   work_management: "Gerenciamento de trabalho",
   projects_and_issues: "Projetos e itens de trabalho",
   projects_and_issues_description: "Ative ou desative estes neste projeto.",
@@ -398,7 +414,6 @@ export default {
   pages_description: "Crie e edite conteúdo livre – anotações, documentos, qualquer coisa.",
   intake_description:
     "Permita que não membros compartilhem bugs, feedbacks e sugestões sem interromper seu fluxo de trabalho.",
-  time_tracking_description: "Registre o tempo gasto em itens de trabalho e projetos.",
   work_management_description: "Gerencie seu trabalho e projetos com facilidade.",
   documentation: "Documentação",
   message_support: "Suporte por mensagem",

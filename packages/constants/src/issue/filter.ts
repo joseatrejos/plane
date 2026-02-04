@@ -335,7 +335,7 @@ export const ACTIVITY_FILTER_TYPE_OPTIONS: Record<TActivityFilterOptionsKey, { l
     labelTranslationKey: "common.assignee",
   },
   [EActivityFilterType.WORKLOG]: {
-    labelTranslationKey: "common.worklog",
+    labelTranslationKey: "worklog.label",
   },
 };
 

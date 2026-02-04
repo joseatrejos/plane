@@ -21,7 +21,7 @@ type Props = {
 
 export function IssueActivityWorklogCreateButton(props: Props) {
   const { disabled, workspaceSlug, projectId, issueId, onCreated } = props;
-  const { t } = useTranslation();
+  const { t } = useTranslation() as { t: (key: string) => string };
   const {
     activity: { addWorklog },
   } = useIssueDetail();
@@ -45,7 +45,7 @@ export function IssueActivityWorklogCreateButton(props: Props) {
       setToast({
         type: TOAST_TYPE.ERROR,
         title: t("common.error.label"),
-        message: t("please_add_duration") || "Please add a duration",
+        message: t("worklog.validation.add_duration") || "Please add a duration",
       });
       return;
     }
@@ -64,7 +64,7 @@ export function IssueActivityWorklogCreateButton(props: Props) {
       setToast({
         type: TOAST_TYPE.SUCCESS,
         title: t("success"),
-        message: t("worklog_success_saved") || "Worklog saved",
+        message: t("worklog.success.saved") || "Worklog saved",
       });
 
       setHours("");
@@ -93,7 +93,7 @@ export function IssueActivityWorklogCreateButton(props: Props) {
       className="relative"
       button={
         <Button variant="neutral-primary" size="sm" prependIcon={<Plus className="h-3 w-3" />} disabled={disabled}>
-          {t("log_work") || "Log work"}
+          {t("worklog.log_work") || "Log work"}
         </Button>
       }
     >
