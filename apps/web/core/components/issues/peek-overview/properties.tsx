@@ -196,26 +196,7 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
         </SidebarPropertyListItem>
 
-        {isEstimateEnabled && (
-          <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
-            <EstimateDropdown
-              value={issue.estimate_point ?? undefined}
-              onChange={(val) => {
-                void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
-              }}
-              projectId={projectId}
-              disabled={disabled}
-              buttonVariant="transparent-with-text"
-              className="w-full grow group"
-              buttonContainerClassName="w-full text-left h-7.5"
-              buttonClassName={`text-body-xs-medium ${issue?.estimate_point !== undefined ? "" : "text-placeholder"}`}
-              placeholder="None"
-              hideIcon
-              dropdownArrow
-              dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
-            />
-          </SidebarPropertyListItem>
-        )}
+        
 
         {projectDetails?.module_view && (
           <SidebarPropertyListItem icon={ModuleIcon} label={t("common.modules")}>
@@ -261,6 +242,27 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
         <SidebarPropertyListItem icon={LabelPropertyIcon} label={t("common.labels")}>
           <IssueLabel workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} disabled={disabled} />
         </SidebarPropertyListItem>
+
+        {isEstimateEnabled && (
+          <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
+            <EstimateDropdown
+              value={issue.estimate_point ?? undefined}
+              onChange={(val) => {
+                void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+              }}
+              projectId={projectId}
+              disabled={disabled}
+              buttonVariant="transparent-with-text"
+              className="w-full grow group"
+              buttonContainerClassName="w-full text-left h-7.5"
+              buttonClassName={`text-body-xs-medium ${issue?.estimate_point !== undefined ? "" : "text-placeholder"}`}
+              placeholder="None"
+              hideIcon
+              dropdownArrow
+              dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
+            />
+          </SidebarPropertyListItem>
+        )}
 
         <IssueTotalWorklog
           workspaceSlug={workspaceSlug}

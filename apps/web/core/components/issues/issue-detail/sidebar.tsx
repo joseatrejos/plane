@@ -48,6 +48,7 @@ import { IssueLabel } from "./label";
 import { IssueTotalWorklog } from "./issue-worklog";
 import { IssueModuleSelect } from "./module-select";
 import type { TIssueOperations } from "./root";
+import { useLabel } from "@/hooks/store/use-label";
 
 type Props = {
   workspaceSlug: string;
@@ -68,6 +69,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
   } = useIssueDetail();
   const { getUserDetails } = useMember();
   const { getStateById } = useProjectState();
+  const { getLabelById } = useLabel();
   const issue = getIssueById(issueId);
   if (!issue) return <></>;
 
@@ -195,27 +197,6 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </div>
             </SidebarPropertyListItem>
 
-            {projectId && areEstimateEnabledByProjectId(projectId) && (
-              <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
-                <EstimateDropdown
-                  value={issue?.estimate_point ?? undefined}
-                  onChange={(val: string | undefined) => {
-                    void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
-                  }}
-                  projectId={projectId}
-                  disabled={!isEditable}
-                  buttonVariant="transparent-with-text"
-                  className="group w-full grow"
-                  buttonContainerClassName="w-full text-left h-7.5"
-                  buttonClassName={`text-body-xs-regular ${issue?.estimate_point !== null ? "" : "text-placeholder"}`}
-                  placeholder={t("common.none")}
-                  hideIcon
-                  dropdownArrow
-                  dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
-                />
-              </SidebarPropertyListItem>
-            )}
-
             {projectDetails?.module_view && (
               <SidebarPropertyListItem icon={ModuleIcon} label={t("common.modules")}>
                 <IssueModuleSelect
@@ -265,6 +246,65 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                 disabled={!isEditable}
               />
             </SidebarPropertyListItem>
+
+            {projectId && areEstimateEnabledByProjectId(projectId) && (
+              <>
+                {(!issue?.label_ids || issue.label_ids.length === 0) && (
+                  <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
+                    <EstimateDropdown
+                      value={issue?.estimate_point ?? undefined}
+                      onChange={(val: string | undefined) => {
+                        void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+                      }}
+                      projectId={projectId}
+                      disabled={!isEditable}
+                      buttonVariant="transparent-with-text"
+                      className="group w-full grow"
+                      placeholder={t("common.none")}
+                      hideIcon
+                      dropdownArrow
+                    />
+                  </SidebarPropertyListItem>
+                )}
+
+                {issue?.label_ids?.map((labelId) => {
+                  const labelDetails = getLabelById(labelId);
+                  if (!labelDetails) return null;
+
+                  return (
+                    <SidebarPropertyListItem 
+                      key={labelId}
+                      icon={EstimatePropertyIcon} 
+                      label={
+                        <>
+                          {t("common.estimate")}
+                          <br />
+                          <span className="text-secondary opacity-70">({labelDetails.name})</span>
+                        </>
+                      }
+                      childrenClassName="!items-center" 
+                    >
+                      <div className="w-full min-h-7.5 flex items-center">
+                        <EstimateDropdown
+                          value={issue?.label_estimates?.[labelId] ?? undefined}
+                          onChange={(val: string | undefined) => {
+                            void issueOperations.updateLabelEstimate(workspaceSlug, projectId, issueId, labelId, val);
+                          }}
+                          projectId={projectId}
+                          disabled={!isEditable}
+                          buttonVariant="transparent-with-text"
+                          className="group w-full grow"
+                          buttonContainerClassName="w-full text-left"
+                          placeholder={t("common.none")}
+                          hideIcon
+                          dropdownArrow
+                        />
+                      </div>
+                    </SidebarPropertyListItem>
+                  );
+                })}
+              </>
+            )}
 
             <IssueTotalWorklog
               workspaceSlug={workspaceSlug}

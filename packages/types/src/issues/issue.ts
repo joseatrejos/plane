@@ -53,6 +53,7 @@ export type TBaseIssue = {
   label_ids: string[];
   assignee_ids: string[];
   estimate_point: string | null;
+  label_estimates?: { [label_id: string]: string | null };
 
   sub_issues_count: number;
   attachment_count: number;

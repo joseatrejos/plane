@@ -51,3 +51,28 @@ class EstimatePoint(ProjectBaseModel):
         verbose_name_plural = "Estimate Points"
         db_table = "estimate_points"
         ordering = ("value",)
+
+
+
+class IssueLabelEstimate(ProjectBaseModel):
+    issue = models.ForeignKey(
+        "db.Issue", 
+        on_delete=models.CASCADE, 
+        related_name="label_estimates"
+    )
+    label = models.ForeignKey(
+        "db.Label", 
+        on_delete=models.CASCADE, 
+        related_name="label_estimates",
+        null=True, # null significa "Estimación por defecto"
+        blank=True
+    )
+    estimate_point = models.ForeignKey(
+        "db.EstimatePoint", 
+        on_delete=models.CASCADE,
+        related_name="label_estimates"
+    )
+
+    class Meta:
+        unique_together = ['issue', 'label']
+        db_table = "issue_label_estimates"
