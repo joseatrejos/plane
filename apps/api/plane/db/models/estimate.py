@@ -74,5 +74,12 @@ class IssueLabelEstimate(ProjectBaseModel):
     )
 
     class Meta:
-        unique_together = ['issue', 'label']
+        unique_together = ["issue", "label", "deleted_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["issue", "label"],
+                condition=Q(deleted_at__isnull=True),
+                name="issue_label_estimate_unique_issue_label_when_deleted_at_null",
+            )
+        ]
         db_table = "issue_label_estimates"

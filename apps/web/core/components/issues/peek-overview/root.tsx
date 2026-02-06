@@ -48,7 +48,7 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
   } = useIssueDetail();
   const issueStoreType = useIssueStoreType();
   const storeType = issueStoreFromProps ?? issueStoreType;
-  const { issues } = useIssues(storeType);
+  const { issues, issueMap } = useIssues(storeType);
 
   useWorkItemProperties(
     peekIssue?.projectId,
@@ -77,27 +77,49 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
       },
       update: async (workspaceSlug: string, projectId: string, issueId: string, data: Partial<TIssue>) => {
         if (issues?.updateIssue) {
-          await issues
-            .updateIssue(workspaceSlug, projectId, issueId, data)
-            .then(async () => {
-              fetchActivities(workspaceSlug, projectId, issueId);
-              return;
-            })
-            .catch((error) => {
-              setToast({
-                title: t("toast.error"),
-                type: TOAST_TYPE.ERROR,
-                message: t("entity.update.failed", { entity: t("issue.label", { count: 1 }) }),
-              });
+          try {
+            await issues.updateIssue(workspaceSlug, projectId, issueId, data);
+            await fetchActivities(workspaceSlug, projectId, issueId);
+          } catch (_error) {
+            setToast({
+              title: t("toast.error"),
+              type: TOAST_TYPE.ERROR,
+              message: t("entity.update.failed", { entity: t("issue.label", { count: 1 }) }),
             });
+          }
+        }
+      },
+      updateLabelEstimate: async (
+        workspaceSlug: string,
+        projectId: string,
+        issueId: string,
+        labelId: string,
+        estimatePointId: string | undefined
+      ) => {
+        if (issues?.updateIssue) {
+          const currentLabelEstimates = issueMap?.[issueId]?.label_estimates ?? {};
+          try {
+            await issues.updateIssue(workspaceSlug, projectId, issueId, {
+              label_estimates: {
+                ...currentLabelEstimates,
+                [labelId]: estimatePointId ?? null,
+              },
+            });
+            await fetchActivities(workspaceSlug, projectId, issueId);
+          } catch (_error) {
+            setToast({
+              title: t("toast.error"),
+              type: TOAST_TYPE.ERROR,
+              message: t("entity.update.failed", { entity: t("issue.label", { count: 1 }) }),
+            });
+          }
         }
       },
       remove: async (workspaceSlug: string, projectId: string, issueId: string) => {
         try {
-          return issues?.removeIssue(workspaceSlug, projectId, issueId).then(() => {
-            removeRoutePeekId();
-            return;
-          });
+          if (!issues?.removeIssue) return;
+          await issues.removeIssue(workspaceSlug, projectId, issueId);
+          removeRoutePeekId();
         } catch (_error) {
           setToast({
             title: t("toast.error"),
@@ -133,7 +155,7 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
       addCycleToIssue: async (workspaceSlug: string, projectId: string, cycleId: string, issueId: string) => {
         try {
           await issues.addCycleToIssue(workspaceSlug, projectId, cycleId, issueId);
-          fetchActivities(workspaceSlug, projectId, issueId);
+          await fetchActivities(workspaceSlug, projectId, issueId);
         } catch (_error) {
           setToast({
             type: TOAST_TYPE.ERROR,
@@ -168,7 +190,7 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
             },
           });
           await removeFromCyclePromise;
-          fetchActivities(workspaceSlug, projectId, issueId);
+          await fetchActivities(workspaceSlug, projectId, issueId);
         } catch (error) {
           console.error("Error removing issue from cycle", error);
         }
@@ -187,7 +209,7 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
           addModuleIds,
           removeModuleIds
         );
-        fetchActivities(workspaceSlug, projectId, issueId);
+        await fetchActivities(workspaceSlug, projectId, issueId);
         return promise;
       },
       removeIssueFromModule: async (workspaceSlug: string, projectId: string, moduleId: string, issueId: string) => {
@@ -205,14 +227,14 @@ export const IssuePeekOverview = observer(function IssuePeekOverview(props: IWor
             },
           });
           await removeFromModulePromise;
-          fetchActivities(workspaceSlug, projectId, issueId);
+          await fetchActivities(workspaceSlug, projectId, issueId);
         } catch (error) {
           console.error("Error removing issue from module", error);
         }
       },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [fetchIssue, is_draft, issues, fetchActivities, pathname, removeRoutePeekId, restoreIssue]
+    [fetchIssue, is_draft, issues, issueMap, fetchActivities, pathname, removeRoutePeekId, restoreIssue]
   );
 
   const { isLoading } = useSWR(

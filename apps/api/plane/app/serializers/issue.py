@@ -42,6 +42,7 @@ from plane.db.models import (
     IssueDescriptionVersion,
     ProjectMember,
     EstimatePoint,
+    IssueLabelEstimate,
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -99,6 +100,8 @@ class IssueCreateSerializer(BaseSerializer):
     )
     project_id = serializers.UUIDField(source="project.id", read_only=True)
     workspace_id = serializers.UUIDField(source="workspace.id", read_only=True)
+
+    label_estimates = serializers.JSONField(required=False, write_only=True)
 
     class Meta:
         model = Issue
@@ -273,10 +276,10 @@ class IssueCreateSerializer(BaseSerializer):
         return issue
 
     def update(self, instance, validated_data):
+        label_estimates = validated_data.pop("label_estimates", None)
         assignees = validated_data.pop("assignee_ids", None)
         labels = validated_data.pop("label_ids", None)
 
-        # Related models
         project_id = instance.project_id
         workspace_id = instance.workspace_id
         created_by_id = instance.created_by_id
@@ -324,7 +327,27 @@ class IssueCreateSerializer(BaseSerializer):
             except IntegrityError:
                 pass
 
-        # Time updation occues even when other related models are updated
+        if label_estimates is not None:
+            
+            for label_id, estimate_point_id in label_estimates.items():
+                if estimate_point_id:
+                    IssueLabelEstimate.objects.update_or_create(
+                        issue=instance,
+                        label_id=label_id,
+                        defaults={
+                            "estimate_point_id": estimate_point_id,
+                            "project_id": project_id,
+                            "workspace_id": workspace_id,
+                            "created_by_id": created_by_id,
+                            "updated_by_id": updated_by_id,
+                        },
+                    )
+                else:
+                    IssueLabelEstimate.objects.filter(
+                        issue=instance, 
+                        label_id=label_id
+                    ).delete()
+
         instance.updated_at = timezone.now()
         return super().update(instance, validated_data)
 
@@ -780,6 +803,8 @@ class IssueSerializer(DynamicBaseSerializer):
     attachment_count = serializers.IntegerField(read_only=True)
     link_count = serializers.IntegerField(read_only=True)
 
+    label_estimates = serializers.SerializerMethodField()
+
     class Meta:
         model = Issue
         fields = [
@@ -808,6 +833,7 @@ class IssueSerializer(DynamicBaseSerializer):
             "link_count",
             "is_draft",
             "archived_at",
+            "label_estimates",
         ]
         read_only_fields = fields
 
@@ -818,7 +844,10 @@ class IssueSerializer(DynamicBaseSerializer):
         ):
             raise serializers.ValidationError("State is not valid please pass a valid state_id")
         return data
-
+    
+    def get_label_estimates(self, obj):
+        estimates = obj.label_estimates.all()
+        return {str(e.label_id): str(e.estimate_point_id) for e in estimates if e.estimate_point_id}
 
 class IssueListDetailSerializer(serializers.Serializer):
     def __init__(self, *args, **kwargs):

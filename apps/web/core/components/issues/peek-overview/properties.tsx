@@ -35,6 +35,8 @@ import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useMember } from "@/hooks/store/use-member";
 import { useProject } from "@/hooks/store/use-project";
 import { useProjectState } from "@/hooks/store/use-project-state";
+import { useProjectEstimates } from "@/hooks/store/estimates";
+import { useLabel } from "@/hooks/store/use-label";
 // plane web components
 import { WorkItemAdditionalSidebarProperties } from "@/plane-web/components/issues/issue-details/additional-properties";
 import { IssueParentSelectRoot } from "@/plane-web/components/issues/issue-details/parent-select-root";
@@ -60,17 +62,18 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
   const { t } = useTranslation();
   // store hooks
   const { getProjectById } = useProject();
+  const { areEstimateEnabledByProjectId } = useProjectEstimates();
   const {
     issue: { getIssueById },
   } = useIssueDetail();
   const { getStateById } = useProjectState();
   const { getUserDetails } = useMember();
+  const { getLabelById } = useLabel();
   // derived values
   const issue = getIssueById(issueId);
   if (!issue) return <></>;
   const createdByDetails = getUserDetails(issue?.created_by);
   const projectDetails = getProjectById(issue.project_id);
-  const isEstimateEnabled = projectDetails?.estimate;
   const stateDetails = getStateById(issue.state_id);
 
   const minDate = getDate(issue.start_date);
@@ -196,8 +199,6 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </div>
         </SidebarPropertyListItem>
 
-        
-
         {projectDetails?.module_view && (
           <SidebarPropertyListItem icon={ModuleIcon} label={t("common.modules")}>
             <IssueModuleSelect
@@ -243,25 +244,68 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           <IssueLabel workspaceSlug={workspaceSlug} projectId={projectId} issueId={issueId} disabled={disabled} />
         </SidebarPropertyListItem>
 
-        {isEstimateEnabled && (
-          <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
-            <EstimateDropdown
-              value={issue.estimate_point ?? undefined}
-              onChange={(val) => {
-                void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
-              }}
-              projectId={projectId}
-              disabled={disabled}
-              buttonVariant="transparent-with-text"
-              className="w-full grow group"
-              buttonContainerClassName="w-full text-left h-7.5"
-              buttonClassName={`text-body-xs-medium ${issue?.estimate_point !== undefined ? "" : "text-placeholder"}`}
-              placeholder="None"
-              hideIcon
-              dropdownArrow
-              dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
-            />
-          </SidebarPropertyListItem>
+        {projectId && areEstimateEnabledByProjectId(projectId) && (
+          <>
+            {(!issue?.label_ids || issue.label_ids.length === 0) && (
+              <SidebarPropertyListItem icon={EstimatePropertyIcon} label={t("common.estimate")}>
+                <EstimateDropdown
+                  value={issue?.estimate_point ?? undefined}
+                  onChange={(val: string | undefined) => {
+                    void issueOperations.update(workspaceSlug, projectId, issueId, { estimate_point: val });
+                  }}
+                  projectId={projectId}
+                  disabled={disabled}
+                  buttonVariant="transparent-with-text"
+                  className="group w-full grow"
+                  buttonContainerClassName="w-full text-left h-7.5"
+                  buttonClassName={`text-body-xs-medium ${issue?.estimate_point !== undefined ? "" : "text-placeholder"}`}
+                  placeholder={t("common.none")}
+                  hideIcon
+                  dropdownArrow
+                  dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
+                />
+              </SidebarPropertyListItem>
+            )}
+
+            {issue?.label_ids?.map((labelId) => {
+              const labelDetails = getLabelById(labelId);
+              if (!labelDetails) return null;
+
+              return (
+                <SidebarPropertyListItem
+                  key={labelId}
+                  icon={EstimatePropertyIcon}
+                  label={
+                    <>
+                      {t("common.estimate")}
+                      <br />
+                      <span className="text-secondary opacity-70">({labelDetails.name})</span>
+                    </>
+                  }
+                  childrenClassName="!items-center"
+                >
+                  <div className="w-full min-h-7.5 flex items-center">
+                    <EstimateDropdown
+                      value={issue?.label_estimates?.[labelId] ?? undefined}
+                      onChange={(val: string | undefined) => {
+                        void issueOperations.updateLabelEstimate(workspaceSlug, projectId, issueId, labelId, val);
+                      }}
+                      projectId={projectId}
+                      disabled={disabled}
+                      buttonVariant="transparent-with-text"
+                      className="group w-full grow"
+                      buttonContainerClassName="w-full text-left h-7.5"
+                      buttonClassName={`text-body-xs-medium ${issue?.label_estimates?.[labelId] !== undefined ? "" : "text-placeholder"}`}
+                      placeholder={t("common.none")}
+                      hideIcon
+                      dropdownArrow
+                      dropdownArrowClassName="h-3.5 w-3.5 hidden group-hover:inline"
+                    />
+                  </div>
+                </SidebarPropertyListItem>
+              );
+            })}
+          </>
         )}
 
         <IssueTotalWorklog
