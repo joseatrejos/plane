@@ -395,6 +395,7 @@ export default {
     },
     validation: {
       add_duration: "???????????",
+      select_label: "????????????",
     },
   },
   work_management: "作業管理",
@@ -2027,6 +2028,13 @@ export default {
         description: "ワークフローを中断することなく、非メンバーがバグ、フィードバック、提案を共有できるようにします。",
         toggle_title: "受付を有効にする",
         toggle_description: "プロジェクトメンバーがアプリ内で受付リクエストを作成できるようにします。",
+      },
+      time_tracking: {
+        title: "時間追跡",
+        short_title: "時間追跡",
+        description: "このプロジェクトの作業項目に費やした時間を記録します。",
+        toggle_title: "時間追跡を有効化",
+        toggle_description: "プロジェクトメンバーが作業時間を記録できます。",
       },
     },
   },

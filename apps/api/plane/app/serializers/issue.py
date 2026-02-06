@@ -43,6 +43,7 @@ from plane.db.models import (
     ProjectMember,
     EstimatePoint,
     IssueLabelEstimate,
+
 )
 from plane.utils.content_validator import (
     validate_html_content,
@@ -326,6 +327,10 @@ class IssueCreateSerializer(BaseSerializer):
                 )
             except IntegrityError:
                 pass
+
+            IssueLabelEstimate.objects.filter(issue=instance, label_id__isnull=False).exclude(
+                label_id__in=labels
+            ).delete()
 
         if label_estimates is not None:
             

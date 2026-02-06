@@ -22,7 +22,7 @@ class IssueWorkLogsEndpoint(BaseAPIView):
     permission_classes = [ProjectEntityPermission]
 
     def post(self, request, slug, project_id, issue_id):
-        serializer = IssueWorkLogSerializer(data=request.data)
+        serializer = IssueWorkLogSerializer(data=request.data, context={"issue_id": issue_id})
         if serializer.is_valid():
             serializer.save(
                 project_id=project_id, issue_id=issue_id, logged_by=request.user
@@ -48,7 +48,7 @@ class IssueWorkLogsEndpoint(BaseAPIView):
         worklog = IssueWorkLog.objects.get(
             pk=pk, issue_id=issue_id, project_id=project_id, workspace__slug=slug
         )
-        serializer = IssueWorkLogSerializer(worklog, data=request.data, partial=True)
+        serializer = IssueWorkLogSerializer(worklog, data=request.data, partial=True, context={"issue_id": issue_id})
         if serializer.is_valid():
             serializer.save()
 

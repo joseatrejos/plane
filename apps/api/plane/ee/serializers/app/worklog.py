@@ -2,6 +2,7 @@
 from rest_framework import serializers
 from plane.app.serializers.base import BaseSerializer
 from plane.ee.models import IssueWorkLog
+from plane.db.models import IssueLabel
 from plane.ee.serializers import IssueLiteSerializer
 
 
@@ -16,6 +17,7 @@ class IssueWorkLogSerializer(BaseSerializer):
             "updated_at",
             "description",
             "duration",
+            "label",
             "created_by",
             "updated_by",
             "project_id",
@@ -24,6 +26,28 @@ class IssueWorkLogSerializer(BaseSerializer):
             "issue_detail",
         ]
         read_only_fields = ["logged_by", "issue", "workspace", "project"]
+
+    def validate(self, data):
+        issue_id = getattr(self.instance, "issue_id", None) or self.context.get("issue_id")
+        if not issue_id:
+            return data
+
+        issue_label_qs = IssueLabel.objects.filter(issue_id=issue_id)
+        has_labels = issue_label_qs.exists()
+
+        if self.instance is None and has_labels and data.get("label") is None:
+            raise serializers.ValidationError("Label is required for worklog when issue has labels")
+
+        if "label" in data:
+            label_value = data.get("label")
+            if has_labels and label_value is None:
+                raise serializers.ValidationError("Label is required for worklog when issue has labels")
+            if label_value is not None:
+                label_id = getattr(label_value, "id", label_value)
+                if not issue_label_qs.filter(label_id=label_id).exists():
+                    raise serializers.ValidationError("Label is not associated with this issue")
+
+        return data
 
 
 class ProjectWorklogSummarySerializer(serializers.Serializer):

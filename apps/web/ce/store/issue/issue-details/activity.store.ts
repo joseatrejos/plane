@@ -40,6 +40,7 @@ export interface TIssueWorklog {
   description: string;
   created_by?: string;
   logged_by?: string;
+  label?: string | null;
 }
 
 export interface IIssueActivityStore extends IIssueActivityStoreActions {
@@ -183,6 +184,7 @@ export class IssueActivityStore implements IIssueActivityStore {
         description: worklog.description, // Pasamos la descripción
         created_by: worklog.created_by,
         logged_by: worklog.logged_by,
+        label: worklog.label ?? null,
       });
     });
 
@@ -216,13 +218,17 @@ export class IssueActivityStore implements IIssueActivityStore {
         if (currentActivity) props = { created_at__gt: currentActivity.created_at };
       }
 
-      // Explicitly type the results of the Promise.all
-      const [activities, worklogs] = await Promise.all([
-        this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props) as Promise<
-          TIssueActivity[]
-        >,
-        this.issueActivityService.getIssueWorklogs(workspaceSlug, projectId, issueId) as Promise<TIssueWorklog[]>,
-      ]);
+      const activities = (await this.issueActivityService.getIssueActivities(
+        workspaceSlug,
+        projectId,
+        issueId,
+        props
+      ));
+      const worklogs = (await this.issueActivityService.getIssueWorklogs(
+        workspaceSlug,
+        projectId,
+        issueId
+      )) as TIssueWorklog[];
 
       const activityIds = activities.map((activity) => activity.id);
       const worklogIds = worklogs.map((w) => w.id);
@@ -230,6 +236,7 @@ export class IssueActivityStore implements IIssueActivityStore {
       runInAction(() => {
         update(this.activities, issueId, (currentActivityIds) => {
           if (!currentActivityIds) return activityIds;
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           return uniq(concat(currentActivityIds, activityIds));
         });
         activities.forEach((activity) => {

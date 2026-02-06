@@ -6,7 +6,7 @@
 
 import { observer } from "mobx-react";
 // i18n
-import { useTranslation } from "@plane/i18n";
+import { useTranslation } from "@/hooks/use-translation";
 // ui
 import {
   CycleIcon,
@@ -50,6 +50,11 @@ import { IssueModuleSelect } from "./module-select";
 import type { TIssueOperations } from "./root";
 import { useLabel } from "@/hooks/store/use-label";
 
+// Define the translation type
+type TTranslation = {
+  t: (key: string, options?: Record<string, unknown>) => string;
+};
+
 type Props = {
   workspaceSlug: string;
   projectId: string;
@@ -59,7 +64,9 @@ type Props = {
 };
 
 export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: Props) {
-  const { t } = useTranslation();
+  // FIX: Double cast to bypass unsafe-assignment and provide type safety for calls
+  const { t } = useTranslation() as unknown as TTranslation;
+
   const { workspaceSlug, projectId, issueId, issueOperations, isEditable } = props;
   // store hooks
   const { getProjectById } = useProject();
@@ -272,9 +279,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                   if (!labelDetails) return null;
 
                   return (
-                    <SidebarPropertyListItem 
+                    <SidebarPropertyListItem
                       key={labelId}
-                      icon={EstimatePropertyIcon} 
+                      icon={EstimatePropertyIcon}
                       label={
                         <>
                           {t("common.estimate")}
@@ -282,7 +289,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                           <span className="text-secondary opacity-70">({labelDetails.name})</span>
                         </>
                       }
-                      childrenClassName="!items-center" 
+                      childrenClassName="!items-center"
                     >
                       <div className="w-full min-h-7.5 flex items-center">
                         <EstimateDropdown
@@ -306,24 +313,28 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
               </>
             )}
 
-            <IssueTotalWorklog
-              workspaceSlug={workspaceSlug}
-              projectId={projectId}
-              issueId={issueId}
-              labelClassName="w-2/5"
-              gapClassName="gap-2"
-            />
+            {projectDetails?.is_time_tracking_enabled && (
+              <>
+                <IssueTotalWorklog
+                  workspaceSlug={workspaceSlug}
+                  projectId={projectId}
+                  issueId={issueId}
+                  labelClassName="w-2/5"
+                  gapClassName="gap-2"
+                />
 
-            <IssueWorklogProperty
-              workspaceSlug={workspaceSlug}
-              projectId={projectId}
-              issueId={issueId}
-              disabled={!isEditable}
-            />
+                <IssueWorklogProperty
+                  workspaceSlug={workspaceSlug}
+                  projectId={projectId}
+                  issueId={issueId}
+                  disabled={!isEditable}
+                />
+              </>
+            )}
 
             <WorkItemAdditionalSidebarProperties
               workItemId={issue.id}
-              workItemTypeId={issue.type_id}
+              workItemType={issue.type_id}
               projectId={projectId}
               workspaceSlug={workspaceSlug}
               isEditable={isEditable}

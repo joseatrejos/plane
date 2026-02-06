@@ -75,6 +75,14 @@ class IssueWorkLog(ProjectBaseModel):
     logged_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="worklogs")
     duration = models.IntegerField(default=0)
 
+    label = models.ForeignKey(
+        "db.Label", 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name="worklogs"
+    )
+
     class Meta:
         verbose_name = "Issue Work Log"
         verbose_name_plural = "Issue Work Logs"

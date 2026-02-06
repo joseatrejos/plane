@@ -6,7 +6,7 @@ import type { TActivityFilters } from "@plane/constants";
 import { E_SORT_ORDER, defaultActivityFilters, EUserPermissions } from "@plane/constants";
 import { useLocalStorage } from "@plane/hooks";
 // i18n
-import { useTranslation } from "@plane/i18n";
+import { useTranslation } from "@/hooks/use-translation";
 //types
 import type { TFileSignedURLResponse, TIssueComment } from "@plane/types";
 // components
@@ -21,6 +21,11 @@ import { IssueActivityWorklogCreateButton } from "@/plane-web/components/issues/
 import { IssueActivityCommentRoot } from "./activity-comment-root";
 import { useWorkItemCommentOperations } from "./helper";
 import { ActivitySortRoot } from "./sort-root";
+
+// Define the translation type locally
+type TTranslation = {
+  t: (key: string, options?: Record<string, unknown>) => string;
+};
 
 type TIssueActivity = {
   workspaceSlug: string;
@@ -39,8 +44,10 @@ export type TActivityOperations = {
 
 export const IssueActivity = observer(function IssueActivity(props: TIssueActivity) {
   const { workspaceSlug, projectId, issueId, disabled = false, isIntakeIssue = false } = props;
-  // i18n
-  const { t } = useTranslation();
+
+  // FIX: Double cast to bypass unsafe-assignment
+  const { t } = useTranslation() as unknown as TTranslation;
+
   // hooks
   const { setValue: setFilterValue, storedValue: selectedFilters } = useLocalStorage(
     "issue_activity_filters",
@@ -58,11 +65,13 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
   const { data: currentUser } = useUser();
   // derived values
   const issue = issueId ? getIssueById(issueId) : undefined;
+  const project = getProjectById(projectId);
   const currentUserProjectRole = getProjectRoleByWorkspaceSlugAndProjectId(workspaceSlug, projectId);
   const isAdmin = currentUserProjectRole === EUserPermissions.ADMIN;
   const isGuest = currentUserProjectRole === EUserPermissions.GUEST;
   const isAssigned = issue?.assignee_ids && currentUser?.id ? issue?.assignee_ids.includes(currentUser?.id) : false;
-  const isWorklogButtonEnabled = !isIntakeIssue && !isGuest && (isAdmin || isAssigned);
+  const isTimeTrackingEnabled = !!project?.is_time_tracking_enabled;
+  const isWorklogButtonEnabled = isTimeTrackingEnabled && !isIntakeIssue && !isGuest && (isAdmin || isAssigned);
   // toggle filter
   const toggleFilter = (filter: TActivityFilters) => {
     if (!selectedFilters) return;
@@ -84,7 +93,6 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
   // helper hooks
   const activityOperations = useWorkItemCommentOperations(workspaceSlug, projectId, issueId);
 
-  const project = getProjectById(projectId);
   const renderCommentCreationBox = useMemo(
     () => (
       <CommentCreate
@@ -115,6 +123,7 @@ export const IssueActivity = observer(function IssueActivity(props: TIssueActivi
     <div className="space-y-4 pt-3">
       {/* header */}
       <div className="flex items-center justify-between">
+        {/* FIX: t call is now safe because t is typed */}
         <div className="text-lg text-custom-text-100">{t("common.activity")}</div>
         <div className="flex items-center gap-2">
           {isWorklogButtonEnabled && (

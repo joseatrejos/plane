@@ -6,7 +6,7 @@
 
 import { observer } from "mobx-react";
 // i18n
-import { useTranslation } from "@plane/i18n";
+import { useTranslation } from "@/hooks/use-translation";
 // ui icons
 import {
   CycleIcon,
@@ -49,6 +49,11 @@ import { IssueLabel } from "../issue-detail/label";
 import { IssueModuleSelect } from "../issue-detail/module-select";
 import { IssueTotalWorklog } from "../issue-detail/issue-worklog";
 
+// Define the translation type locally
+type TTranslation = {
+  t: (key: string, options?: Record<string, unknown>) => string;
+};
+
 interface IPeekOverviewProperties {
   workspaceSlug: string;
   projectId: string;
@@ -59,7 +64,10 @@ interface IPeekOverviewProperties {
 
 export const PeekOverviewProperties = observer(function PeekOverviewProperties(props: IPeekOverviewProperties) {
   const { workspaceSlug, projectId, issueId, issueOperations, disabled } = props;
-  const { t } = useTranslation();
+
+  // FIX: Cast to unknown then to TTranslation to clear assignment and call warnings
+  const { t } = useTranslation() as unknown as TTranslation;
+
   // store hooks
   const { getProjectById } = useProject();
   const { areEstimateEnabledByProjectId } = useProjectEstimates();
@@ -308,24 +316,28 @@ export const PeekOverviewProperties = observer(function PeekOverviewProperties(p
           </>
         )}
 
-        <IssueTotalWorklog
-          workspaceSlug={workspaceSlug}
-          projectId={projectId}
-          issueId={issueId}
-          labelClassName="w-1/4"
-          gapClassName="gap-3"
-        />
+        {projectDetails?.is_time_tracking_enabled && (
+          <>
+            <IssueTotalWorklog
+              workspaceSlug={workspaceSlug}
+              projectId={projectId}
+              issueId={issueId}
+              labelClassName="w-1/4"
+              gapClassName="gap-3"
+            />
 
-        <IssueWorklogProperty
-          workspaceSlug={workspaceSlug}
-          projectId={projectId}
-          issueId={issueId}
-          disabled={disabled}
-        />
+            <IssueWorklogProperty
+              workspaceSlug={workspaceSlug}
+              projectId={projectId}
+              issueId={issueId}
+              disabled={disabled}
+            />
+          </>
+        )}
 
         <WorkItemAdditionalSidebarProperties
           workItemId={issue.id}
-          workItemTypeId={issue.type_id}
+          workItemType={issue.type_id}
           projectId={projectId}
           workspaceSlug={workspaceSlug}
           isEditable={!disabled}

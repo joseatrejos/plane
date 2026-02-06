@@ -402,6 +402,7 @@ export default {
     },
     validation: {
       add_duration: "Por favor, adicione uma dura??o",
+      select_label: "Selecione um rótulo",
     },
   },
   work_management: "Gerenciamento de trabalho",
@@ -2052,6 +2053,13 @@ export default {
           "Permita que não membros compartilhem bugs, feedback e sugestões; sem interromper seu fluxo de trabalho.",
         toggle_title: "Ativar recepção",
         toggle_description: "Permitir que membros do projeto criem solicitações de recepção no aplicativo.",
+      },
+      time_tracking: {
+        title: "Rastreamento de tempo",
+        short_title: "Rastreamento de tempo",
+        description: "Registre e acompanhe o tempo gasto nos itens de trabalho deste projeto.",
+        toggle_title: "Ativar rastreamento de tempo",
+        toggle_description: "Os membros do projeto poderão registrar trabalho.",
       },
     },
   },

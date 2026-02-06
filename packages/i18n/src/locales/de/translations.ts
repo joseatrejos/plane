@@ -405,6 +405,7 @@ export default {
     },
     validation: {
       add_duration: "Bitte eine Dauer hinzuf?gen",
+      select_label: "Bitte w?hlen Sie ein Label aus",
     },
   },
   work_management: "Arbeitsverwaltung",
@@ -2049,6 +2050,13 @@ export default {
           "Ermöglichen Sie Nicht-Mitgliedern, Fehler, Feedback und Vorschläge zu teilen, ohne Ihren Workflow zu unterbrechen.",
         toggle_title: "Aufnahme aktivieren",
         toggle_description: "Projektmitgliedern erlauben, In-App-Aufnahmeanfragen zu erstellen.",
+      },
+      time_tracking: {
+        title: "Zeiterfassung",
+        short_title: "Zeiterfassung",
+        description: "Erfassen Sie die Zeit, die für Arbeitselemente in diesem Projekt aufgewendet wird.",
+        toggle_title: "Zeiterfassung aktivieren",
+        toggle_description: "Projektmitglieder können Arbeitszeit erfassen.",
       },
     },
   },
