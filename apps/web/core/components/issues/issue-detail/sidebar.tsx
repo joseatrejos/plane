@@ -284,9 +284,9 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                       icon={EstimatePropertyIcon}
                       label={
                         <>
-                          {t("common.estimate")}
+                          {labelDetails.name}
                           <br />
-                          <span className="text-secondary opacity-70">({labelDetails.name})</span>
+                          <span className="text-secondary opacity-70">{t("common.estimate")}</span>
                         </>
                       }
                       childrenClassName="!items-center"
