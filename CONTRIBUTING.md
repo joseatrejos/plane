@@ -100,7 +100,6 @@ When editing compiled assets like icons, translations, or other non-React code, 
 > Node v22.18.0
 > NPM 10.9.3
 
-docker compose -f docker-compose-local.yml up --build
 
 1. Clean the project:
 
