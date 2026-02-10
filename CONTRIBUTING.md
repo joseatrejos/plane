@@ -96,6 +96,12 @@ That’s it! You’re all set to begin coding. Remember to refresh your browser 
 
 When editing compiled assets like icons, translations, or other non-React code, the development server may crash and fail to restart. If this happens, follow these steps:
 
+>Minimal versions:
+> Node v22.18.0
+> NPM 10.9.3
+
+docker compose -f docker-compose-local.yml up --build
+
 1. Clean the project:
 
 ```bash
