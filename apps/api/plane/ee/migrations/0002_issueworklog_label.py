@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db', '0121_issueuserproperty_and_more'),
+        ('db', '0120_issue_label_estimate_soft_delete'),
         ('ee', '0001_initial'),
     ]
 
