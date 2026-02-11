@@ -30,6 +30,13 @@ import { IssueDetailsSidebar } from "./sidebar";
 export type TIssueOperations = {
   fetch: (workspaceSlug: string, projectId: string, issueId: string, loader?: boolean) => Promise<void>;
   update: (workspaceSlug: string, projectId: string, issueId: string, data: Partial<TIssue>) => Promise<void>;
+  updateLabelEstimate: (
+    workspaceSlug: string,
+    projectId: string,
+    issueId: string,
+    labelId: string,
+    estimatePointId: string | undefined
+  ) => Promise<void>;
   remove: (workspaceSlug: string, projectId: string, issueId: string) => Promise<void>;
   archive?: (workspaceSlug: string, projectId: string, issueId: string) => Promise<void>;
   restore?: (workspaceSlug: string, projectId: string, issueId: string) => Promise<void>;
@@ -96,6 +103,31 @@ export const IssueDetailRoot = observer(function IssueDetailRoot(props: TIssueDe
           await updateIssue(workspaceSlug, projectId, issueId, data);
         } catch (error) {
           console.log("Error in updating issue:", error);
+          setToast({
+            title: t("common.error.label"),
+            type: TOAST_TYPE.ERROR,
+            message: t("entity.update.failed", { entity: t("issue.label") }),
+          });
+        }
+      },
+      updateLabelEstimate: async (
+        workspaceSlug: string,
+        projectId: string,
+        issueId: string,
+        labelId: string,
+        estimatePointId: string | undefined
+      ) => {
+        try {
+          const currentIssue = getIssueById(issueId);
+          const currentLabelEstimates = currentIssue?.label_estimates ?? {};
+          await updateIssue(workspaceSlug, projectId, issueId, {
+            label_estimates: {
+              ...currentLabelEstimates,
+              [labelId]: estimatePointId ?? null,
+            },
+          });
+        } catch (error) {
+          console.log("Error in updating label estimate:", error);
           setToast({
             title: t("common.error.label"),
             type: TOAST_TYPE.ERROR,
@@ -211,6 +243,7 @@ export const IssueDetailRoot = observer(function IssueDetailRoot(props: TIssueDe
       removeIssueFromCycle,
       changeModulesInIssue,
       removeIssueFromModule,
+      getIssueById,
       t,
     ]
   );

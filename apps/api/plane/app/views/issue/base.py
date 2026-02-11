@@ -613,6 +613,11 @@ class IssueViewSet(BaseViewSet):
 
     @allow_permission(allowed_roles=[ROLE.ADMIN, ROLE.MEMBER], creator=True, model=Issue)
     def partial_update(self, request, slug, project_id, pk=None):
+        print("*"*100)
+        print("*"*100)
+        print("*"*100)
+        print("*"*100)
+        print("*"*100)
         queryset = self.get_queryset()
         queryset = self.apply_annotations(queryset)
 

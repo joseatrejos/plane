@@ -231,6 +231,7 @@ export default {
     },
     validation: {
       add_duration: "Please add duration",
+      select_label: "Please select a label",
     },
   },
   work_management: "Work management",
@@ -1899,6 +1900,13 @@ export default {
         description: "Let non-members share bugs, feedback, and suggestions; without disrupting your workflow.",
         toggle_title: "Enable intake",
         toggle_description: "Let project members create in app intake requests.",
+      },
+      time_tracking: {
+        title: "Time tracking",
+        short_title: "Time tracking",
+        description: "Track and log time spent on work items in this project.",
+        toggle_title: "Enable time tracking",
+        toggle_description: "Project members will be able to log work.",
       },
     },
   },

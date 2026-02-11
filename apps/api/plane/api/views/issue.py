@@ -66,6 +66,7 @@ from plane.db.models import (
     FileAsset,
     IssueComment,
     IssueLink,
+    IssueLabelEstimate,
     Label,
     Project,
     ProjectMember,
@@ -1033,6 +1034,10 @@ class LabelDetailAPIEndpoint(LabelListCreateAPIEndpoint):
         This action cannot be undone.
         """
         label = self.get_queryset().get(pk=pk)
+        IssueLabelEstimate.objects.filter(label_id=label.id, deleted_at__isnull=True).update(
+            deleted_at=timezone.now(),
+            updated_by=request.user,
+        )
         label.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

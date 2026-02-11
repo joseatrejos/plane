@@ -4,7 +4,7 @@
  * See the LICENSE file for details.
  */
 
-import { set, update } from "lodash-es";
+import { set } from "lodash-es";
 import { action, makeObservable, observable, runInAction } from "mobx";
 import { computedFn } from "mobx-utils";
 // types
@@ -68,8 +68,11 @@ export class IssueStore implements IIssueStore {
         const issueIdentifier = `${projectIdentifier}-${workItemSequenceId}`;
         set(this.issuesIdentifierMap, issueIdentifier, issue.id);
 
-        if (!this.issuesMap[issue.id]) set(this.issuesMap, issue.id, issue);
-        else update(this.issuesMap, issue.id, (prevIssue) => ({ ...prevIssue, ...issue }));
+        if (!this.issuesMap[issue.id]) {
+          set(this.issuesMap, issue.id, issue);
+        } else {
+          set(this.issuesMap, issue.id, { ...(this.issuesMap[issue.id] ?? {}), ...issue });
+        }
       });
     });
   };
@@ -108,6 +111,16 @@ export class IssueStore implements IIssueStore {
   updateIssue = (issueId: string, issue: Partial<TIssue>) => {
     if (!issue || !issueId || !this.issuesMap[issueId]) return;
     runInAction(() => {
+      if ("label_ids" in issue) {
+        const labelIds = issue.label_ids ?? [];
+        const currentLabelEstimates = this.issuesMap[issueId]?.label_estimates;
+        if (currentLabelEstimates) {
+          const nextLabelEstimates = Object.fromEntries(
+            Object.entries(currentLabelEstimates).filter(([labelId]) => labelIds.includes(labelId))
+          );
+          set(this.issuesMap, [issueId, "label_estimates"], nextLabelEstimates);
+        }
+      }
       set(this.issuesMap, [issueId, "updated_at"], getCurrentDateTimeInISO());
       Object.keys(issue).forEach((key) => {
         set(this.issuesMap, [issueId, key], issue[key as keyof TIssue]);

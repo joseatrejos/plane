@@ -66,7 +66,7 @@ export const InboxIssueMainContent = observer(function InboxIssueMainContent(pro
   useEffect(() => {
     if (isSubmitting === "submitted") {
       setShowAlert(false);
-      setTimeout(async () => {
+      setTimeout(() => {
         setIsSubmitting("saved");
       }, 3000);
     } else if (isSubmitting === "submitting") {
@@ -77,25 +77,20 @@ export const InboxIssueMainContent = observer(function InboxIssueMainContent(pro
   // derived values
   const issue = inboxIssue.issue;
   const projectDetails = issue?.project_id ? getProjectById(issue?.project_id) : undefined;
+  const workspaceId =
+    typeof projectDetails?.workspace === "string" ? projectDetails.workspace : projectDetails?.workspace?.id;
   const isIntakeAccepted = inboxIssue.status === EInboxIssueStatus.ACCEPTED;
 
   // debounced duplicate issues swr
-  const { duplicateIssues } = useDebouncedDuplicateIssues(
-    workspaceSlug,
-    projectDetails?.workspace.toString(),
-    projectId,
-    {
-      name: issue?.name,
-      description_html: getTextContent(issue?.description_html),
-      issueId: issue?.id,
-    }
-  );
+  const { duplicateIssues } = useDebouncedDuplicateIssues(workspaceSlug, workspaceId, projectId, {
+    name: issue?.name,
+    description_html: getTextContent(issue?.description_html),
+    issueId: issue?.id,
+  });
 
   const issueOperations: TIssueOperations = useMemo(
     () => ({
-      fetch: async (_workspaceSlug: string, _projectId: string, _issueId: string) => {
-        return;
-      },
+      fetch: (_workspaceSlug: string, _projectId: string, _issueId: string) => Promise.resolve(),
 
       remove: async (_workspaceSlug: string, _projectId: string, _issueId: string) => {
         try {
@@ -105,8 +100,7 @@ export const InboxIssueMainContent = observer(function InboxIssueMainContent(pro
             type: TOAST_TYPE.SUCCESS,
             message: "Work item deleted successfully",
           });
-        } catch (error) {
-          console.log("Error in deleting work item:", error);
+        } catch (_error) {
           setToast({
             title: "Error!",
             type: TOAST_TYPE.ERROR,
@@ -117,7 +111,30 @@ export const InboxIssueMainContent = observer(function InboxIssueMainContent(pro
       update: async (_workspaceSlug: string, _projectId: string, _issueId: string, data: Partial<TIssue>) => {
         try {
           await inboxIssue.updateIssue(data);
-        } catch (error) {
+        } catch (_error) {
+          setToast({
+            title: "Work item update failed",
+            type: TOAST_TYPE.ERROR,
+            message: "Work item update failed",
+          });
+        }
+      },
+      updateLabelEstimate: async (
+        _workspaceSlug: string,
+        _projectId: string,
+        _issueId: string,
+        labelId: string,
+        estimatePointId: string | undefined
+      ) => {
+        try {
+          const currentLabelEstimates = issue?.label_estimates ?? {};
+          await inboxIssue.updateIssue({
+            label_estimates: {
+              ...currentLabelEstimates,
+              [labelId]: estimatePointId ?? null,
+            },
+          });
+        } catch (_error) {
           setToast({
             title: "Work item update failed",
             type: TOAST_TYPE.ERROR,
@@ -128,12 +145,12 @@ export const InboxIssueMainContent = observer(function InboxIssueMainContent(pro
       archive: async (workspaceSlug: string, projectId: string, issueId: string) => {
         try {
           await archiveIssue(workspaceSlug, projectId, issueId);
-        } catch (error) {
-          console.error("Error in archiving issue:", error);
+        } catch (_error) {
+          console.error("Error in archiving issue");
         }
       },
     }),
-    [inboxIssue]
+    [archiveIssue, inboxIssue, issue?.label_estimates, projectId, removeIssue, workspaceSlug]
   );
 
   if (!issue) return <></>;

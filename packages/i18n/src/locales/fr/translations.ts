@@ -401,6 +401,7 @@ export default {
     },
     validation: {
       add_duration: "Veuillez ajouter une dur?e",
+      select_label: "Veuillez sélectionner une étiquette",
     },
   },
   work_management: "Organisation du travail",
@@ -2056,6 +2057,13 @@ export default {
           "Permettez aux non-membres de partager des bugs, des commentaires et des suggestions ; sans perturber votre flux de travail.",
         toggle_title: "Activer la réception",
         toggle_description: "Permettre aux membres du projet de créer des demandes de réception dans l'application.",
+      },
+      time_tracking: {
+        title: "Suivi du temps",
+        short_title: "Suivi du temps",
+        description: "Suivez et enregistrez le temps passé sur les éléments de travail de ce projet.",
+        toggle_title: "Activer le suivi du temps",
+        toggle_description: "Les membres du projet pourront enregistrer du travail.",
       },
     },
   },

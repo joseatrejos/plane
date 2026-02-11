@@ -57,7 +57,7 @@ class IssueWorklogAPIEndpoint(BaseAPIView):
                 {"message": "Worklog is not enabled for the project"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-        serializer = IssueWorkLogAPISerializer(data=request.data)
+        serializer = IssueWorkLogAPISerializer(data=request.data, context={"issue_id": issue_id})
         if serializer.is_valid():
             serializer.save(
                 project_id=project_id, issue_id=issue_id, logged_by=request.user
@@ -144,7 +144,7 @@ class IssueWorklogAPIEndpoint(BaseAPIView):
         worklog = IssueWorkLog.objects.get(
             pk=pk, issue_id=issue_id, project_id=project_id, workspace__slug=slug
         )
-        serializer = IssueWorkLogAPISerializer(worklog, data=request.data, partial=True)
+        serializer = IssueWorkLogAPISerializer(worklog, data=request.data, partial=True, context={"issue_id": issue_id})
         if serializer.is_valid():
             serializer.save()
 

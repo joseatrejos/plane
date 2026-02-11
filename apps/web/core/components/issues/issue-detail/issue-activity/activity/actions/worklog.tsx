@@ -5,18 +5,19 @@ import { Network } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import { Tooltip } from "@plane/propel/tooltip";
 import { Avatar } from "@plane/ui";
-import { useTranslation } from "@plane/i18n";
+import { useTranslation } from "@/hooks/use-translation";
 import { API_BASE_URL } from "@plane/constants";
 import { setToast, TOAST_TYPE } from "@plane/propel/toast";
 import { renderFormattedTime, renderFormattedDate, calculateTimeAgo, getFileURL } from "@plane/utils";
 import { usePlatformOS } from "@/hooks/use-platform-os";
 import { useIssueDetail } from "@/hooks/store/use-issue-detail";
 import { useMember } from "@/hooks/store/use-member";
+import { useLabel } from "@/hooks/store/use-label";
 import { WorklogQuickActions } from "./helpers/worklog";
+import { LabelActivityChip } from "./label-activity-chip";
 import type { TIssueWorklog } from "@/plane-web/store/issue/issue-details/activity.store";
 import { Icon } from "@plane/propel/icons";
 import { WorklogForm } from "@/plane-web/components/issues/worklog/activity/worklog-form";
-
 
 // Define proper types for the worklog data
 interface ActorDetail {
@@ -36,6 +37,7 @@ interface Worklog {
   created_at: string;
   duration: number;
   description?: string;
+  label?: string | null;
 }
 
 type TWorklogBlockComponent = {
@@ -125,14 +127,24 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
   // store hooks
   const {
     activity: { addWorklog, removeWorklog },
+    issue: { getIssueById },
   } = useIssueDetail();
   const { getUserDetails } = useMember();
+  const { getLabelById } = useLabel();
   const { t } = useTranslation() as { t: (key: string) => string };
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editHours, setEditHours] = useState("");
   const [editMinutes, setEditMinutes] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editLabelId, setEditLabelId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const issue = getIssueById(props.issueId);
+  const labelOptions =
+    issue?.label_ids
+      ?.map((id) => getLabelById(id))
+      .filter((label): label is { id: string; name: string; color?: string } => Boolean(label))
+      .map((label) => ({ id: label.id, name: label.name, color: label.color })) ?? [];
+  const shouldShowLabelSelect = labelOptions.length > 0;
 
   if (!activityComment) return null;
 
@@ -145,6 +157,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
 
   const hours = Math.floor(activityComment.duration / 60);
   const minutes = activityComment.duration % 60;
+  const labelDetails = activityComment.label ? getLabelById(activityComment.label) : null;
 
   const openEditPopover = () => {
     const initialHours = Math.floor(activityComment.duration / 60);
@@ -152,6 +165,7 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
     setEditHours(initialHours ? String(initialHours) : "");
     setEditMinutes(initialMinutes ? String(initialMinutes) : "");
     setEditDescription(activityComment.description ?? "");
+    setEditLabelId(activityComment.label ?? null);
     setIsEditOpen(true);
   };
 
@@ -170,13 +184,22 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
       return;
     }
 
+    if (shouldShowLabelSelect && !editLabelId) {
+      setToast({
+        type: TOAST_TYPE.ERROR,
+        title: t("common.error.label"),
+        message: t("worklog.validation.select_label") || "Please select a label",
+      });
+      return;
+    }
+
     setIsSaving(true);
     const url = `${API_BASE_URL}/api/workspaces/${props.workspaceSlug}/projects/${props.projectId}/issues/${props.issueId}/worklogs/${activityComment.id}/`;
 
     try {
       const response = await axios.patch<TIssueWorklog>(
         url,
-        { duration, description: editDescription },
+        { duration, description: editDescription, label: shouldShowLabelSelect ? editLabelId : null },
         { withCredentials: true }
       );
       addWorklog(props.issueId, response.data);
@@ -222,6 +245,12 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
         {hours}h {minutes}m
       </span>{" "}
       of work
+      {labelDetails ? (
+        <>
+          {" "}
+          <LabelActivityChip name={labelDetails.name} color={labelDetails.color} />
+        </>
+      ) : null}
     </>
   );
 
@@ -238,6 +267,10 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
         hours={editHours}
         minutes={editMinutes}
         description={editDescription}
+        labelId={editLabelId}
+        labelOptions={labelOptions}
+        onLabelChange={setEditLabelId}
+        showLabelSelect={shouldShowLabelSelect}
         onHoursChange={setEditHours}
         onMinutesChange={setEditMinutes}
         onDescriptionChange={setEditDescription}

@@ -7,6 +7,7 @@ import random
 
 # Django imports
 from django.db import IntegrityError
+from django.utils import timezone
 
 # Third Party imports
 from rest_framework.response import Response
@@ -16,7 +17,7 @@ from rest_framework import status
 from .. import BaseViewSet, BaseAPIView
 from plane.app.serializers import LabelSerializer
 from plane.app.permissions import allow_permission, ProjectBasePermission, ROLE
-from plane.db.models import Project, Label
+from plane.db.models import Project, Label, IssueLabelEstimate
 from plane.utils.cache import invalidate_cache
 
 
@@ -84,6 +85,11 @@ class LabelViewSet(BaseViewSet):
     @invalidate_cache(path="/api/workspaces/:slug/labels/", url_params=True, user=False)
     @allow_permission([ROLE.ADMIN])
     def destroy(self, request, *args, **kwargs):
+        label = self.get_object()
+        IssueLabelEstimate.objects.filter(label_id=label.id, deleted_at__isnull=True).update(
+            deleted_at=timezone.now(),
+            updated_by=request.user,
+        )
         return super().destroy(request, *args, **kwargs)
 
 

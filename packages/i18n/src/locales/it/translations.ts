@@ -399,6 +399,7 @@ export default {
     },
     validation: {
       add_duration: "Per favore aggiungi una durata",
+      select_label: "Seleziona un'etichetta",
     },
   },
   work_management: "Gestione del lavoro",
@@ -2045,6 +2046,13 @@ export default {
           "Consenti ai non membri di condividere bug, feedback e suggerimenti; senza interrompere il tuo flusso di lavoro.",
         toggle_title: "Abilita ricezione",
         toggle_description: "Consenti ai membri del progetto di creare richieste di ricezione nell'app.",
+      },
+      time_tracking: {
+        title: "Rilevazione del tempo",
+        short_title: "Rilevazione del tempo",
+        description: "Registra e monitora il tempo dedicato agli elementi di lavoro di questo progetto.",
+        toggle_title: "Abilita rilevazione del tempo",
+        toggle_description: "I membri del progetto potranno registrare lavoro.",
       },
     },
   },
