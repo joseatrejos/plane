@@ -1,13 +1,16 @@
 # Module imports
 from plane.app.serializers.base import BaseSerializer
 from plane.ee.models import IssueWorkLog
-from plane.db.models import IssueLabel
+from plane.db.models import IssueLabel, Label
 
 # Third party imports
 from rest_framework import serializers
 
 
 class IssueWorkLogAPISerializer(BaseSerializer):
+    label_name = serializers.SerializerMethodField()
+    label_color = serializers.SerializerMethodField()
+
     class Meta:
         model = IssueWorkLog
         fields = [
@@ -17,6 +20,8 @@ class IssueWorkLogAPISerializer(BaseSerializer):
             "description",
             "duration",
             "label",
+            "label_name",
+            "label_color",
             "created_by",
             "updated_by",
             "project_id",
@@ -24,6 +29,16 @@ class IssueWorkLogAPISerializer(BaseSerializer):
             "logged_by",
         ]
         read_only_fields = ["logged_by", "workspace", "project"]
+
+    def get_label_name(self, obj):
+        if not obj.label_id:
+            return None
+        return Label.all_objects.filter(id=obj.label_id).values_list("name", flat=True).first()
+
+    def get_label_color(self, obj):
+        if not obj.label_id:
+            return None
+        return Label.all_objects.filter(id=obj.label_id).values_list("color", flat=True).first()
 
     def validate(self, data):
         issue_id = getattr(self.instance, "issue_id", None) or self.context.get("issue_id")

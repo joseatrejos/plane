@@ -38,6 +38,8 @@ interface Worklog {
   duration: number;
   description?: string;
   label?: string | null;
+  label_name?: string | null;
+  label_color?: string | null;
 }
 
 type TWorklogBlockComponent = {
@@ -157,7 +159,15 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
 
   const hours = Math.floor(activityComment.duration / 60);
   const minutes = activityComment.duration % 60;
-  const labelDetails = activityComment.label ? getLabelById(activityComment.label) : null;
+  const activeLabelDetails = activityComment.label ? getLabelById(activityComment.label) : null;
+  const labelDetails =
+    activeLabelDetails ??
+    (activityComment.label_name
+      ? {
+          name: activityComment.label_name,
+          color: activityComment.label_color ?? undefined,
+        }
+      : null);
 
   const openEditPopover = () => {
     const initialHours = Math.floor(activityComment.duration / 60);
@@ -197,11 +207,13 @@ export const IssueActivityWorklog = observer(function IssueActivityWorklog(props
     const url = `${API_BASE_URL}/api/workspaces/${props.workspaceSlug}/projects/${props.projectId}/issues/${props.issueId}/worklogs/${activityComment.id}/`;
 
     try {
-      const response = await axios.patch<TIssueWorklog>(
-        url,
-        { duration, description: editDescription, label: shouldShowLabelSelect ? editLabelId : null },
-        { withCredentials: true }
-      );
+      const payload: { duration: number; description: string; label?: string | null } = {
+        duration,
+        description: editDescription,
+      };
+      if (shouldShowLabelSelect) payload.label = editLabelId;
+
+      const response = await axios.patch<TIssueWorklog>(url, payload, { withCredentials: true });
       addWorklog(props.issueId, response.data);
       window.dispatchEvent(new CustomEvent("worklog_updated"));
       close?.();

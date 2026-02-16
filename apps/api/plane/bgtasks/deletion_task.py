@@ -41,6 +41,17 @@ def soft_delete_related_objects(app_label, model_name, instance_pk, using=None):
         if not hasattr(instance, related_name):
             continue
 
+        # Never mutate worklog-label linkage when deleting a label.
+        # Worklog history should preserve its original label reference.
+        if (
+            model_class._meta.label_lower == "db.label"
+            and relation.related_model is not None
+            and relation.related_model._meta.label_lower == "ee.issueworklog"
+            and relation.remote_field is not None
+            and relation.remote_field.name == "label"
+        ):
+            continue
+
         # Get the on_delete behavior name
         on_delete_name = relation.on_delete.__name__ if hasattr(relation.on_delete, "__name__") else ""
 

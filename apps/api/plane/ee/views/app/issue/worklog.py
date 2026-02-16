@@ -41,6 +41,7 @@ class IssueWorkLogsEndpoint(BaseAPIView):
             project_id=project_id,
             workspace__slug=slug,
         ).accessible_to(request.user.id, slug)
+
         serializer = IssueWorkLogSerializer(worklogs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

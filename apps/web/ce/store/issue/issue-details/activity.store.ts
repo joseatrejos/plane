@@ -41,6 +41,8 @@ export interface TIssueWorklog {
   created_by?: string;
   logged_by?: string;
   label?: string | null;
+  label_name?: string | null;
+  label_color?: string | null;
 }
 
 export interface IIssueActivityStore extends IIssueActivityStoreActions {
@@ -185,6 +187,8 @@ export class IssueActivityStore implements IIssueActivityStore {
         created_by: worklog.created_by,
         logged_by: worklog.logged_by,
         label: worklog.label ?? null,
+        label_name: worklog.label_name ?? null,
+        label_color: worklog.label_color ?? null,
       });
     });
 
@@ -218,12 +222,7 @@ export class IssueActivityStore implements IIssueActivityStore {
         if (currentActivity) props = { created_at__gt: currentActivity.created_at };
       }
 
-      const activities = (await this.issueActivityService.getIssueActivities(
-        workspaceSlug,
-        projectId,
-        issueId,
-        props
-      ));
+      const activities = await this.issueActivityService.getIssueActivities(workspaceSlug, projectId, issueId, props);
       const worklogs = (await this.issueActivityService.getIssueWorklogs(
         workspaceSlug,
         projectId,
