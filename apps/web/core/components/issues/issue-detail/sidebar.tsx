@@ -267,7 +267,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                       disabled={!isEditable}
                       buttonVariant="transparent-with-text"
                       className="group w-full grow"
-                      placeholder={t("common.none")}
+                      placeholder={t("project_settings.estimates.no_estimate")}
                       hideIcon
                       dropdownArrow
                     />
@@ -302,7 +302,7 @@ export const IssueDetailsSidebar = observer(function IssueDetailsSidebar(props: 
                           buttonVariant="transparent-with-text"
                           className="group w-full grow"
                           buttonContainerClassName="w-full text-left"
-                          placeholder={t("common.none")}
+                          placeholder={t("project_settings.estimates.no_estimate")}
                           hideIcon
                           dropdownArrow
                         />
