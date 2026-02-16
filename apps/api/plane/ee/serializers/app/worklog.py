@@ -39,7 +39,12 @@ class IssueWorkLogSerializer(BaseSerializer):
     def get_label_color(self, obj):
         if not obj.label_id:
             return None
-        return Label.all_objects.filter(id=obj.label_id).values_list("color", flat=True).first()
+        label_data = Label.all_objects.filter(id=obj.label_id).values("color", "deleted_at").first()
+        if not label_data:
+            return None
+        if label_data.get("deleted_at") is not None:
+            return None
+        return label_data.get("color")
 
     def validate(self, data):
         issue_id = getattr(self.instance, "issue_id", None) or self.context.get("issue_id")
